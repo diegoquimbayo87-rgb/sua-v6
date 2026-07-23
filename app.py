@@ -1,6 +1,6 @@
 # SÚA v6.0 | Quantitative Engine — Dashboard Profesional (Versión Final Corregida)
 import streamlit as st
-import pandas as pd, numpy as np, csv, os, requests
+import pandas as pd, numpy as np, csv, os, requests, math
 from datetime import datetime, timedelta
 
 st.set_page_config(page_title="SÚA v6.0 — Quant Engine", layout="wide", initial_sidebar_state="expanded")
@@ -288,7 +288,7 @@ if st.button("▶️ Activar Modo Simulación (Sin Arriesgar Capital Real)", use
 
 st.subheader("🔬 VISUALIZACIÓN INTERACTIVA DEL MODELO POISSON")
 poisson_x = list(range(0, 15))
-poisson_y = [np.exp(-3.5) * (3.5**k) / np.math.factorial(k) for k in poisson_x]
+poisson_y = [np.exp(-3.5) * (3.5**k) / math.factorial(k) for k in poisson_x]
 poisson_df = pd.DataFrame({"Córneres Esperados": poisson_x, "Probabilidad Poisson": poisson_y})
 st.line_chart(poisson_df.set_index("Córneres Esperados"))
 st.caption("Distribución Poisson calibrada con λ=3.5 (media de córneres proyectada para el partido activo).")
