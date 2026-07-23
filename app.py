@@ -11,6 +11,7 @@ st.set_page_config(page_title="SÚA v6.0 — Quant Intelligence", layout="wide",
 # ESTILOS MINIMALISTAS (APPLE + BLOOMBERG)
 # ==========================================
 TERMINAL_CSS = """
+<style>
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
 
