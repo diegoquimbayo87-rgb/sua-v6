@@ -9,23 +9,39 @@ API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"
 THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"
 SPORTMONKS_KEY = "Aul9KNwcdeGqtmwHRR7VpUUQPxL7n2a3LmBqxEcwo1lOAhSJhAf1aYaZgkU9"
 
-# ==================== ESTILOS CSS PROFESIONALES (CERO ROJOS, BOTONES SÓLIDOS) ====================
+# ==================== ESTILOS CSS PROFESIONALES (CERO ROJOS, SÓLIDOS AZUL/GRIS) ====================
 st.markdown("""
 <style>
     .main {background-color: #0E1117;}
     
-    /* Forzar diseño limpio y elegante en toda la interfaz */
+    /* Forzar acentos neutros y azules ejecutivos, eliminando rojo por completo */
     :root {
-        --primary: #F97316;
+        --primary: #3B82F6;
         --bg-dark: #0E1117;
         --card-bg: #1F2937;
         --text-main: #F3F4F6;
     }
 
-    /* Eliminar cualquier sombra o color rojo indeseado de Streamlit */
-    input[type="radio"] {accent-color: #F97316 !important;}
+    /* Anular cualquier rastro de rojo en acentos de inputs o bordes activos */
+    input[type="radio"] {accent-color: #3B82F6 !important;}
     
-    /* Contenedor de tarjetas ejecutivas */
+    /* Forzar que los botones primarios de Streamlit usen azul corporativo en vez de rojo/rosa */
+    div.stButton > button[kind="primary"] {
+        background-color: #2563EB !important;
+        border-color: #2563EB !important;
+        color: #FFFFFF !important;
+    }
+    
+    div.stButton > button[kind="primary"]:hover {
+        background-color: #1D4ED8 !important;
+        border-color: #1D4ED8 !important;
+    }
+
+    /* Eliminar efectos de hover rojos en enlaces o pestañas */
+    a:hover, button:hover {
+        color: #60A5FA !important;
+    }
+
     .executive-card {
         background-color: #1F2937;
         padding: 24px;
@@ -74,7 +90,7 @@ for op in menu_opciones:
 
 st.sidebar.divider()
 st.sidebar.markdown(
-    '<div style="background-color: #166534; color: #22C55E; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
+    '<div style="background-color: #1E3A8A; color: #93C5FD; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
     unsafe_allow_html=True
 )
 
@@ -89,14 +105,14 @@ if nav == "Dashboard - Oportunidades":
     """)
     st.divider()
 
-    # Botones sólidos personalizados para las sub-pestañas (Evitando rojo de Streamlit)
+    # Botones sólidos personalizados para las sub-pestañas
     col_t1, col_t2, _ = st.columns([2, 2, 3])
     with col_t1:
-        if st.button("📅 Hoy (23 Julio - Top 10)", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
+        if st.button("Hoy (23 Julio - Top 10)", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
             st.session_state.tab_active = "hoy"
             st.rerun()
     with col_t2:
-        if st.button("⏭️ Mañana (24 Julio - Top 5)", use_container_width=True, type="primary" if st.session_state.tab_active=="mañana" else "secondary"):
+        if st.button("Mañana (24 Julio - Top 5)", use_container_width=True, type="primary" if st.session_state.tab_active=="mañana" else "secondary"):
             st.session_state.tab_active = "mañana"
             st.rerun()
 
@@ -332,8 +348,6 @@ elif nav == "Checklists IC":
         st.markdown("* **Árbitro > 5.0:** 30 pts\n* **Faltas equipo > 22:** 25 pts\n* **Derbi / Rivalidad:** 20 pts\n* **Contexto tabla:** 15 pts\n* **H2H fricción:** 10 pts")
 
 # ==================== 4. MATRIZ DE DECISIÓN ====================
-elif nav == "Matriz de Decision":
-    pass # Replaced below properly
 elif nav == "Matriz de Decisión":
     st.markdown("## Matriz de Decisión v4.2")
     st.markdown("""
