@@ -9,7 +9,7 @@ API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"
 THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"
 SPORTMONKS_KEY = "Aul9KNwcdeGqtmwHRR7VpUUQPxL7n2a3LmBqxEcwo1lOAhSJhAf1aYaZgkU9"
 
-# ==================== ESTILOS CSS PROFESIONALES (AZUL ACERO SUAVE Y ETIQUETAS DE ESTADO) ====================
+# ==================== ESTILOS CSS PROFESIONALES ====================
 st.markdown("""
 <style>
     .main {background-color: #0E1117;}
@@ -54,10 +54,13 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializar Estado de Sesión
+# Inicializar Estado de Sesión y Bankroll
+if "bankroll_inicial" not in st.session_state:
+    st.session_state.bankroll_inicial = 2000000.0  # 2 Millones COP por defecto
+
 if "registro_apuestas" not in st.session_state:
     st.session_state.registro_apuestas = pd.DataFrame(columns=[
-        "Consecutivo", "Fecha", "Hora", "Liga", "Torneo", "Partido", "Mercado", "IC", 
+        "Consecutivo", "Fecha", "Hora", "Liga", "Torneo", "Partido", "Mercado", "Casa", "IC", 
         "Cuota Proyectada", "Cuota Real Apostada", "Inversión ($)", "Edge Real", "Decisión", "Stake", "Resultado", "Ganancia ($)"
     ])
 
@@ -67,11 +70,16 @@ if "nav_active" not in st.session_state:
 if "tab_active" not in st.session_state:
     st.session_state.tab_active = "hoy"
 
-# ==================== SIDEBAR: BOTONES SÓLIDOS DE NAVEGACIÓN ====================
+# ==================== SIDEBAR: NAVEGACIÓN Y CONFIGURACIÓN DE BANKROLL ====================
 st.sidebar.markdown("## **SÚA v6.3**")
 st.sidebar.caption("Terminal Cuantitativa — Bogotá")
 st.sidebar.divider()
 
+st.sidebar.markdown("### Configuración de Capital")
+bankroll_input = st.sidebar.number_input("Bankroll Inicial (COP $)", value=float(st.session_state.bankroll_inicial), step=100000.0)
+st.session_state.bankroll_inicial = bankroll_input
+
+st.sidebar.divider()
 st.sidebar.markdown("### Módulos Operativos")
 
 menu_opciones = [
@@ -121,32 +129,31 @@ if nav == "Dashboard - Oportunidades":
 
     # Top 6 de Hoy
     opps_hoy = [
-        {"id": 1, "hora": "14:00", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Manchester City vs Arsenal", "mercado": "Over 2.5 Goles", "cuota": 2.15, "pin": 2.02, "ic": 92, "edge": 11.2, "dec": "APOSTAR FUERTE", "stake": "3.5%", "estado": "Pendiente", "trend": [1.95, 2.00, 2.08, 2.15]},
-        {"id": 2, "hora": "16:00", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Liverpool vs Chelsea", "mercado": "Over 2.5 Goles", "cuota": 1.95, "pin": 1.85, "ic": 89, "edge": 8.5, "dec": "APOSTAR", "stake": "2.5%", "estado": "Pendiente", "trend": [1.80, 1.85, 1.90, 1.95]},
-        {"id": 3, "hora": "12:30", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Aston Villa vs Tottenham", "mercado": "Over 10.5 Corners", "cuota": 2.30, "pin": 2.12, "ic": 88, "edge": 9.4, "dec": "APOSTAR", "stake": "2.5%", "estado": "Pendiente", "trend": [2.15, 2.20, 2.25, 2.30]},
-        {"id": 4, "hora": "15:00", "liga": "Serie A", "torneo": "Calcio Italiano", "partido": "Napoli vs AC Milan", "mercado": "Over 4.5 Tarjetas", "cuota": 2.40, "pin": 2.20, "ic": 87, "edge": 10.1, "dec": "APOSTAR FUERTE", "stake": "3.0%", "estado": "Pendiente", "trend": [2.20, 2.25, 2.35, 2.40]},
-        {"id": 5, "hora": "18:30", "liga": "Brasileirao", "torneo": "Serie A Brasil", "partido": "Flamengo vs Palmeiras", "mercado": "Over 2.5 Goles", "cuota": 2.25, "pin": 2.08, "ic": 85, "edge": 8.1, "dec": "APOSTAR", "stake": "2.0%", "estado": "Pendiente", "trend": [2.10, 2.15, 2.20, 2.25]},
-        {"id": 6, "hora": "17:00", "liga": "Liga Profesional", "torneo": "Fútbol Argentino", "partido": "River Plate vs Boca Juniors", "mercado": "Over 5.5 Tarjetas", "cuota": 2.55, "pin": 2.32, "ic": 84, "edge": 10.7, "dec": "APOSTAR", "stake": "2.0%", "estado": "Pendiente", "trend": [2.35, 2.40, 2.50, 2.55]}
+        {"id": 1, "hora": "14:00", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Manchester City vs Arsenal", "mercado": "Over 2.5 Goles", "casa": "Rushbet", "cuota": 2.15, "pin": 2.02, "ic": 92, "edge": 11.2, "dec": "APOSTAR FUERTE", "stake_pct": 0.035, "trend": [1.95, 2.00, 2.08, 2.15]},
+        {"id": 2, "hora": "16:00", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Liverpool vs Chelsea", "mercado": "Over 2.5 Goles", "casa": "Rushbet", "cuota": 1.95, "pin": 1.85, "ic": 89, "edge": 8.5, "dec": "APOSTAR", "stake_pct": 0.025, "trend": [1.80, 1.85, 1.90, 1.95]},
+        {"id": 3, "hora": "12:30", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Aston Villa vs Tottenham", "mercado": "Over 10.5 Corners", "casa": "Wplay", "cuota": 2.30, "pin": 2.12, "ic": 88, "edge": 9.4, "dec": "APOSTAR", "stake_pct": 0.025, "trend": [2.15, 2.20, 2.25, 2.30]},
+        {"id": 4, "hora": "15:00", "liga": "Serie A", "torneo": "Calcio Italiano", "partido": "Napoli vs AC Milan", "mercado": "Over 4.5 Tarjetas", "casa": "Rushbet", "cuota": 2.40, "pin": 2.20, "ic": 87, "edge": 10.1, "dec": "APOSTAR FUERTE", "stake_pct": 0.030, "trend": [2.20, 2.25, 2.35, 2.40]},
+        {"id": 5, "hora": "18:30", "liga": "Brasileirao", "torneo": "Serie A Brasil", "partido": "Flamengo vs Palmeiras", "mercado": "Over 2.5 Goles", "casa": "Codere", "cuota": 2.25, "pin": 2.08, "ic": 85, "edge": 8.1, "dec": "APOSTAR", "stake_pct": 0.020, "trend": [2.10, 2.15, 2.20, 2.25]},
+        {"id": 6, "hora": "17:00", "liga": "Liga Profesional", "torneo": "Fútbol Argentino", "partido": "River Plate vs Boca Juniors", "mercado": "Over 5.5 Tarjetas", "casa": "Rushbet", "cuota": 2.55, "pin": 2.32, "ic": 84, "edge": 10.7, "dec": "APOSTAR", "stake_pct": 0.020, "trend": [2.35, 2.40, 2.50, 2.55]}
     ]
 
     # Top 10 del Día Siguiente (Rotación)
     opps_mañana = [
-        {"id": 101, "hora": "13:00", "liga": "La Liga", "torneo": "Temporada Regular", "partido": "Real Madrid vs Barcelona", "mercado": "Over 10.5 Corners", "cuota": 2.45, "pin": 2.22, "ic": 90, "edge": 9.8, "dec": "APOSTAR FUERTE", "stake": "3.0%", "trend": [2.30, 2.35, 2.40, 2.45]},
-        {"id": 102, "hora": "15:30", "liga": "Serie A", "torneo": "Calcio Italiano", "partido": "Juventus vs Inter", "mercado": "Over 2.5 Goles", "cuota": 2.28, "pin": 2.10, "ic": 86, "edge": 8.5, "dec": "APOSTAR", "stake": "2.5%", "trend": [2.15, 2.20, 2.25, 2.28]},
-        {"id": 103, "hora": "17:00", "liga": "Primeira Liga", "torneo": "Liga Portugal", "partido": "Porto vs Benfica", "mercado": "Over 5.5 Tarjetas", "cuota": 2.50, "pin": 2.28, "ic": 84, "edge": 9.6, "dec": "APOSTAR", "stake": "2.0%", "trend": [2.35, 2.40, 2.45, 2.50]},
-        {"id": 104, "hora": "20:00", "liga": "Ligue 1", "torneo": "Fútbol Francés", "partido": "PSG vs Marseille", "mercado": "Over 4.5 Tarjetas", "cuota": 2.40, "pin": 2.19, "ic": 82, "edge": 9.5, "dec": "APOSTAR", "stake": "2.0%", "trend": [2.25, 2.30, 2.35, 2.40]},
-        {"id": 105, "hora": "21:30", "liga": "MLS", "torneo": "Conferencia Este/Oeste", "partido": "LA Galaxy vs LAFC", "mercado": "Over 3.5 Goles", "cuota": 2.35, "pin": 2.15, "ic": 80, "edge": 9.3, "dec": "APOSTAR MODERADO", "stake": "1.5%", "trend": [2.20, 2.25, 2.30, 2.35]},
-        {"id": 106, "hora": "14:00", "liga": "Eredivisie", "torneo": "Países Bajos", "partido": "Ajax vs PSV", "mercado": "Over 3.5 Goles", "cuota": 2.20, "pin": 2.02, "ic": 79, "edge": 8.9, "dec": "MODERADO", "stake": "1.5%", "trend": [2.10, 2.15, 2.18, 2.20]},
-        {"id": 107, "hora": "16:30", "liga": "Superliga", "torneo": "Dinamarca", "partido": "Copenhagen vs Brondby", "mercado": "Over 4.5 Tarjetas", "cuota": 2.35, "pin": 2.14, "ic": 78, "edge": 9.8, "dec": "MODERADO", "stake": "1.5%", "trend": [2.20, 2.25, 2.30, 2.35]},
-        {"id": 108, "hora": "18:00", "liga": "Liga Pro", "torneo": "Ecuador", "partido": "Barcelona SC vs Emelec", "mercado": "Over 5.5 Tarjetas", "cuota": 2.60, "pin": 2.36, "ic": 77, "edge": 10.1, "dec": "MODERADO", "stake": "1.0%", "trend": [2.40, 2.48, 2.55, 2.60]},
-        {"id": 109, "hora": "19:30", "liga": "Liga BetPlay", "torneo": "Colombia", "partido": "Millonarios vs Atletico Nacional", "mercado": "Over 2.5 Goles", "cuota": 2.25, "pin": 2.05, "ic": 76, "edge": 9.7, "dec": "MODERADO", "stake": "1.0%", "trend": [2.10, 2.15, 2.20, 2.25]},
-        {"id": 110, "hora": "21:00", "liga": "Liga Profesional", "torneo": "Argentina", "partido": "San Lorenzo vs Independiente", "mercado": "Under 2.5 Goles", "cuota": 1.90, "pin": 1.78, "ic": 75, "edge": 6.7, "dec": "MODERADO", "stake": "1.0%", "trend": [1.82, 1.85, 1.88, 1.90]}
+        {"id": 101, "hora": "13:00", "liga": "La Liga", "torneo": "Temporada Regular", "partido": "Real Madrid vs Barcelona", "mercado": "Over 10.5 Corners", "casa": "Rushbet", "cuota": 2.45, "pin": 2.22, "ic": 90, "edge": 9.8, "dec": "APOSTAR FUERTE", "stake_pct": 0.030, "trend": [2.30, 2.35, 2.40, 2.45]},
+        {"id": 102, "hora": "15:30", "liga": "Serie A", "torneo": "Calcio Italiano", "partido": "Juventus vs Inter", "mercado": "Over 2.5 Goles", "casa": "Wplay", "cuota": 2.28, "pin": 2.10, "ic": 86, "edge": 8.5, "dec": "APOSTAR", "stake_pct": 0.025, "trend": [2.15, 2.20, 2.25, 2.28]},
+        {"id": 103, "hora": "17:00", "liga": "Primeira Liga", "torneo": "Liga Portugal", "partido": "Porto vs Benfica", "mercado": "Over 5.5 Tarjetas", "casa": "Codere", "cuota": 2.50, "pin": 2.28, "ic": 84, "edge": 9.6, "dec": "APOSTAR", "stake_pct": 0.020, "trend": [2.35, 2.40, 2.45, 2.50]},
+        {"id": 104, "hora": "20:00", "liga": "Ligue 1", "torneo": "Fútbol Francés", "partido": "PSG vs Marseille", "mercado": "Over 4.5 Tarjetas", "casa": "Rushbet", "cuota": 2.40, "pin": 2.19, "ic": 82, "edge": 9.5, "dec": "APOSTAR", "stake_pct": 0.020, "trend": [2.25, 2.30, 2.35, 2.40]},
+        {"id": 105, "hora": "21:30", "liga": "MLS", "torneo": "Conferencia Este/Oeste", "partido": "LA Galaxy vs LAFC", "mercado": "Over 3.5 Goles", "casa": "Rushbet", "cuota": 2.35, "pin": 2.15, "ic": 80, "edge": 9.3, "dec": "APOSTAR MODERADO", "stake_pct": 0.015, "trend": [2.20, 2.25, 2.30, 2.35]},
+        {"id": 106, "hora": "14:00", "liga": "Eredivisie", "torneo": "Países Bajos", "partido": "Ajax vs PSV", "mercado": "Over 3.5 Goles", "casa": "Wplay", "cuota": 2.20, "pin": 2.02, "ic": 79, "edge": 8.9, "dec": "MODERADO", "stake_pct": 0.015, "trend": [2.10, 2.15, 2.18, 2.20]},
+        {"id": 107, "hora": "16:30", "liga": "Superliga", "torneo": "Dinamarca", "partido": "Copenhagen vs Brondby", "mercado": "Over 4.5 Tarjetas", "casa": "Codere", "cuota": 2.35, "pin": 2.14, "ic": 78, "edge": 9.8, "dec": "MODERADO", "stake_pct": 0.015, "trend": [2.20, 2.25, 2.30, 2.35]},
+        {"id": 108, "hora": "18:00", "liga": "Liga Pro", "torneo": "Ecuador", "partido": "Barcelona SC vs Emelec", "mercado": "Over 5.5 Tarjetas", "casa": "Rushbet", "cuota": 2.60, "pin": 2.36, "ic": 77, "edge": 10.1, "dec": "MODERADO", "stake_pct": 0.010, "trend": [2.40, 2.48, 2.55, 2.60]},
+        {"id": 109, "hora": "19:30", "liga": "Liga BetPlay", "torneo": "Colombia", "partido": "Millonarios vs Atletico Nacional", "mercado": "Over 2.5 Goles", "casa": "Rushbet", "cuota": 2.25, "pin": 2.05, "ic": 76, "edge": 9.7, "dec": "MODERADO", "stake_pct": 0.010, "trend": [2.10, 2.15, 2.20, 2.25]},
+        {"id": 110, "hora": "21:00", "liga": "Liga Profesional", "torneo": "Argentina", "partido": "San Lorenzo vs Independiente", "mercado": "Under 2.5 Goles", "casa": "Wplay", "cuota": 1.90, "pin": 1.78, "ic": 75, "edge": 6.7, "dec": "MODERADO", "stake_pct": 0.010, "trend": [1.82, 1.85, 1.88, 1.90]}
     ]
 
     if st.session_state.tab_active == "hoy":
         st.subheader("Top 6 Oportunidades del Día (Ordenadas por Convicción y Edge)")
         for opp in opps_hoy:
-            # Buscar si el partido ya fue apostado en el registro para actualizar etiqueta de estado
             estado_lbl = '<span class="tag-pendiente">Naranja: Pendiente</span>'
             if not st.session_state.registro_apuestas.empty:
                 match_reg = st.session_state.registro_apuestas[st.session_state.registro_apuestas["Partido"] == opp['partido']]
@@ -159,18 +166,20 @@ if nav == "Dashboard - Oportunidades":
                     else:
                         estado_lbl = '<span class="tag-verde">Verde: Apostado (Pendiente)</span>'
 
+            inversion_calculada = st.session_state.bankroll_inicial * opp['stake_pct']
+
             with st.expander(f"#{opp['id']} — {opp['hora']} | {opp['partido']} | {opp['mercado']} (IC: {opp['ic']} | Edge: +{opp['edge']}%)"):
                 st.markdown(f"**Estado del Partido:** {estado_lbl}", unsafe_allow_html=True)
                 st.markdown("<br>", unsafe_allow_html=True)
 
                 c1, c2, c3, c4, c5 = st.columns(5)
-                with c1: st.metric("Cuota Rushbet", opp['cuota'])
+                with c1: st.metric(f"Cuota ({opp['casa']})", opp['cuota'])
                 with c2: st.metric("Cuota Pinnacle", opp['pin'])
                 with c3: st.metric("IC Cuantitativo", opp['ic'])
                 with c4: st.metric("Edge Estimado", f"+{opp['edge']}%")
                 with c5: 
                     st.markdown(f"**Decisión:** `{opp['dec']}`")
-                    st.markdown(f"**Stake:** `{opp['stake']}`")
+                    st.markdown(f"**Stake Rec.:** `$ {inversion_calculada:,.0f} COP` ({opp['stake_pct']*100}%)")
                 
                 st.markdown("---")
                 st.markdown("📈 **Evolución Histórica de la Cuota (Mercado):**")
@@ -185,13 +194,14 @@ if nav == "Dashboard - Oportunidades":
                         "Torneo": opp['torneo'],
                         "Partido": opp['partido'],
                         "Mercado": opp['mercado'],
+                        "Casa": opp['casa'],
                         "IC": opp['ic'],
                         "Cuota Proyectada": opp['cuota'],
                         "Cuota Real Apostada": opp['cuota'],
-                        "Inversión ($)": 50000,
+                        "Inversión ($)": inversion_calculada,
                         "Edge Real": f"+{opp['edge']}%",
                         "Decisión": opp['dec'],
-                        "Stake": opp['stake'],
+                        "Stake": f"{opp['stake_pct']*100}%",
                         "Resultado": "Pendiente",
                         "Ganancia ($)": 0.0
                     }
@@ -202,44 +212,44 @@ if nav == "Dashboard - Oportunidades":
         st.subheader("Top 10 Oportunidades del Día Siguiente (Rotación Programada)")
         st.markdown("Selecciona de este bloque las oportunidades que deseas pasar al análisis principal o enviar directamente a tus órdenes.")
         for opp in opps_mañana:
+            inversion_calculada = st.session_state.bankroll_inicial * opp['stake_pct']
             with st.expander(f"#{opp['id']} — 24 Jul {opp['hora']} | {opp['partido']} | {opp['mercado']} (IC: {opp['ic']} | Edge: +{opp['edge']}%)"):
                 c1, c2, c3, c4, c5 = st.columns(5)
-                with c1: st.metric("Cuota Rushbet", opp['cuota'])
+                with c1: st.metric(f"Cuota ({opp['casa']})", opp['cuota'])
                 with c2: st.metric("Cuota Pinnacle", opp['pin'])
                 with c3: st.metric("IC Cuantitativo", opp['ic'])
                 with c4: st.metric("Edge Estimado", f"+{opp['edge']}%")
                 with c5: 
                     st.markdown(f"**Decisión:** `{opp['dec']}`")
-                    st.markdown(f"**Stake:** `{opp['stake']}`")
+                    st.markdown(f"**Stake Rec.:** `$ {inversion_calculada:,.0f} COP` ({opp['stake_pct']*100}%)")
                 
                 st.markdown("---")
                 st.markdown("📈 **Evolución Histórica de la Cuota (Mercado):**")
                 st.line_chart(opp['trend'])
                 
-                col_btn1, col_btn2 = st.columns(2)
-                with col_btn1:
-                    if st.button(f"Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_man_{opp['id']}"):
-                        nuevo_reg = {
-                            "Consecutivo": len(st.session_state.registro_apuestas) + 1,
-                            "Fecha": "2026-07-24",
-                            "Hora": opp['hora'],
-                            "Liga": opp['liga'],
-                            "Torneo": opp['torneo'],
-                            "Partido": opp['partido'],
-                            "Mercado": opp['mercado'],
-                            "IC": opp['ic'],
-                            "Cuota Proyectada": opp['cuota'],
-                            "Cuota Real Apostada": opp['cuota'],
-                            "Inversión ($)": 50000,
-                            "Edge Real": f"+{opp['edge']}%",
-                            "Decisión": opp['dec'],
-                            "Stake": opp['stake'],
-                            "Resultado": "Pendiente",
-                            "Ganancia ($)": 0.0
-                        }
-                        st.session_state.registro_apuestas = pd.concat([st.session_state.registro_apuestas, pd.DataFrame([nuevo_reg])], ignore_index=True)
-                        st.success(f"Orden creada con éxito para {opp['partido']}.")
-                        st.rerun()
+                if st.button(f"Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_man_{opp['id']}"):
+                    nuevo_reg = {
+                        "Consecutivo": len(st.session_state.registro_apuestas) + 1,
+                        "Fecha": "2026-07-24",
+                        "Hora": opp['hora'],
+                        "Liga": opp['liga'],
+                        "Torneo": opp['torneo'],
+                        "Partido": opp['partido'],
+                        "Mercado": opp['mercado'],
+                        "Casa": opp['casa'],
+                        "IC": opp['ic'],
+                        "Cuota Proyectada": opp['cuota'],
+                        "Cuota Real Apostada": opp['cuota'],
+                        "Inversión ($)": inversion_calculada,
+                        "Edge Real": f"+{opp['edge']}%",
+                        "Decisión": opp['dec'],
+                        "Stake": f"{opp['stake_pct']*100}%",
+                        "Resultado": "Pendiente",
+                        "Ganancia ($)": 0.0
+                    }
+                    st.session_state.registro_apuestas = pd.concat([st.session_state.registro_apuestas, pd.DataFrame([nuevo_reg])], ignore_index=True)
+                    st.success(f"Orden creada con éxito para {opp['partido']}.")
+                    st.rerun()
 
 # ==================== 2. NUEVO ANÁLISIS ====================
 elif nav == "Nuevo Análisis":
@@ -274,6 +284,7 @@ elif nav == "Nuevo Análisis":
         st.info(f"Liga: **{info_partido['liga']}** | Torneo: **{info_partido['torneo']}**")
         
         mercado = st.selectbox("Seleccionar Mercado", ["Over / Under Goles", "Córneres", "Tarjetas"])
+        casa_apuestas = st.selectbox("Casa de Apuestas", ["Rushbet", "Wplay", "Codere", "Betsson", "Pinnacle"])
         
         ic_total = 0
         st.markdown("#### Evaluación de Criterios Paramétricos")
@@ -319,15 +330,18 @@ elif nav == "Nuevo Análisis":
         with r1:
             st.metric("Índice de Convicción (IC)", f"{ic_total} / 100")
         with r2:
-            cuota_rushbet = st.number_input("Cuota proyectada en Rushbet", value=2.10, step=0.01)
+            cuota_rushbet = st.number_input("Cuota proyectada en Bookmaker", value=2.10, step=0.01)
             cuota_pinnacle = st.number_input("Cuota de referencia Pinnacle", value=1.95, step=0.01)
 
         edge_calc = ((cuota_rushbet / cuota_pinnacle) - 1) * 100 if cuota_pinnacle > 0 else 0
         st.info(f"Edge Estimado vs Pinnacle: **+{edge_calc:.2f}%**")
 
+        stake_pct_val = 0.035 if ic_total >= 90 else (0.025 if ic_total >= 82 else (0.015 if ic_total >= 74 else 0.01))
+        inversion_calculada = st.session_state.bankroll_inicial * stake_pct_val
+        st.metric("Inversión Recomendada (Stake Dinámico)", f"$ {inversion_calculada:,.0f} COP ({stake_pct_val*100}%)")
+
         if st.button("Registrar Orden y Enviar a Control Financiero"):
-            decision = "APOSTAR" if ic_total >= 80 else "MODERADO"
-            stake = "2.5%" if ic_total >= 80 else "1.5%"
+            decision = "APOSTAR FUERTE" if ic_total >= 90 else ("APOSTAR" if ic_total >= 82 else "MODERADO")
             
             nueva_orden = {
                 "Consecutivo": len(st.session_state.registro_apuestas) + 1,
@@ -337,13 +351,14 @@ elif nav == "Nuevo Análisis":
                 "Torneo": info_partido['torneo'],
                 "Partido": partido_seleccionado,
                 "Mercado": mercado,
+                "Casa": casa_apuestas,
                 "IC": ic_total,
                 "Cuota Proyectada": cuota_rushbet,
                 "Cuota Real Apostada": cuota_rushbet,
-                "Inversión ($)": 50000,
+                "Inversión ($)": inversion_calculada,
                 "Edge Real": f"+{edge_calc:.1f}%",
                 "Decisión": decision,
-                "Stake": stake,
+                "Stake": f"{stake_pct_val*100}%",
                 "Resultado": "Pendiente",
                 "Ganancia ($)": 0.0
             }
@@ -404,7 +419,7 @@ elif nav == "Sharp Comparison":
     with col2:
         equipo_visitante = st.text_input("Equipo Visitante")
         
-    cuota_rush = st.number_input("Cuota tomada en Rushbet", value=2.05, step=0.01)
+    cuota_rush = st.number_input("Cuota tomada en Bookmaker", value=2.05, step=0.01)
     cuota_pin = st.number_input("Cuota de referencia (Pinnacle)", value=1.90, step=0.01)
     
     if st.button("Calcular Edge y CLV Real"):
@@ -417,36 +432,63 @@ elif nav == "Sharp Comparison":
 
 # ==================== 6. REGISTRO Y CONTROL FINANCIERO ====================
 elif nav == "Registro y Control Financiero":
-    st.markdown("## Registro y Control Financiero de Órdenes")
+    st.markdown("## Registro y Control Financiero e Institucional")
     st.markdown("""
-    > **Propósito del módulo:** Auditoría y rendimiento operativo. Al cambiar el estado a **Ganada** o **Perdida**, 
-    > el dashboard principal actualizará la etiqueta del partido automáticamente a color verde o rojo.
+    > **Propósito del módulo:** Auditoría avanzada de rendimiento, control de bankroll, análisis de rentabilidad (Yield y ROI) 
+    > y seguimiento por casas de apuestas. Al cambiar el estado a **Ganada** o **Perdida**, el sistema recalcula métricas y curvas de capital.
     """)
     st.divider()
 
     df_reg = st.session_state.registro_apuestas
 
     if not df_reg.empty:
+        # Calcular KPIs Financieros avanzados
         total_ordenes = len(df_reg)
         ganadas = len(df_reg[df_reg["Resultado"] == "Ganada"])
         perdidas = len(df_reg[df_reg["Resultado"] == "Perdida"])
         pendientes = len(df_reg[df_reg["Resultado"] == "Pendiente"])
         
-        m1, m2, m3, m4 = st.columns(4)
-        with m1: st.metric("Total Órdenes Aceptadas", total_ordenes)
-        with m2: st.metric("Órdenes Ganadas", ganadas, delta=f"{ganadas*100/max(total_ordenes, 1):.1f}%")
-        with m3: st.metric("Órdenes Perdidas", perdidas)
-        with m4: st.metric("Órdenes Pendientes", pendientes)
+        resueltas = ganadas + perdidas
+        winrate = (ganadas / max(resueltas, 1)) * 100
+        
+        inversion_total = df_reg[df_reg["Resultado"] != "Pendiente"]["Inversión ($)"].sum()
+        ganancia_neta_total = df_reg["Ganancia ($)"].sum()
+        yield_pct = (ganancia_neta_total / max(inversion_total, 1)) * 100
+        
+        bankroll_actual = st.session_state.bankroll_inicial + ganancia_neta_total
+
+        m1, m2, m3, m4, m5, m6 = st.columns(6)
+        with m1: st.metric("Bankroll Actual", f"$ {bankroll_actual:,.0f}")
+        with m2: st.metric("Profit Neto", f"$ {ganancia_neta_total:,.0f}")
+        with m3: st.metric("Yield / ROI", f"{yield_pct:.2f}%")
+        with m4: st.metric("Winrate", f"{winrate:.1f}%", delta=f"{ganadas}G / {perdidas}P")
+        with m5: st.metric("Total Órdenes", total_ordenes)
+        with m6: st.metric("Pendientes", pendientes)
         
         st.divider()
-        st.subheader("Auditoría y Edición de Cuota Real / Resultados")
-        st.markdown("Modifica el campo **Resultado** (`Ganada` / `Perdida` / `Pendiente`) para que el sistema pinte las etiquetas correspondientes en el Dashboard.")
 
-        edited_df = st.data_editor(df_reg, use_container_width=True, key="editor_registro")
+        # Filtros Avanzados para la Tabla
+        st.markdown("#### Filtros de Auditoría")
+        col_f1, col_f2 = st.columns(2)
+        with col_f1:
+            filtro_resultado = st.selectbox("Filtrar por Estado", ["Todos", "Ganada", "Perdida", "Pendiente"])
+        with col_f2:
+            casas_disponibles = ["Todas"] + list(df_reg["Casa"].unique()) if "Casa" in df_reg.columns else ["Todas"]
+            filtro_casa = st.selectbox("Filtrar por Casa de Apuestas", casas_disponibles)
+
+        df_filtrado = df_reg.copy()
+        if filtro_resultado != "Todos":
+            df_filtrado = df_filtrado[df_filtrado["Resultado"] == filtro_resultado]
+        if filtro_casa != "Todas":
+            df_filtrado = df_filtrado[df_filtrado["Casa"] == filtro_casa]
+
+        st.subheader("Edición de Cuota Real y Resultados")
+        edited_df = st.data_editor(df_filtrado, use_container_width=True, key="editor_registro")
         
-        if st.button("Actualizar Cálculos Financieros"):
+        if st.button("Actualizar Cálculos y Sincronizar Sistema"):
             for idx, row in edited_df.iterrows():
                 try:
+                    orig_idx = row["Consecutivo"] - 1
                     cuota_real = float(row["Cuota Real Apostada"])
                     inversion = float(row["Inversión ($)"])
                     res = row["Resultado"]
@@ -456,15 +498,28 @@ elif nav == "Registro y Control Financiero":
                         ganancia = -inversion
                     else:
                         ganancia = 0.0
-                    edited_df.at[idx, "Ganancia ($)"] = round(ganancia, 2)
-                except:
+                    
+                    st.session_state.registro_apuestas.at[orig_idx, "Cuota Real Apostada"] = cuota_real
+                    st.session_state.registro_apuestas.at[orig_idx, "Resultado"] = res
+                    st.session_state.registro_apuestas.at[orig_idx, "Ganancia ($)"] = round(ganancia, 2)
+                except Exception as e:
                     pass
-            st.session_state.registro_apuestas = edited_df
-            st.success("¡Registros y estados actualizados con éxito!")
+            st.success("¡Registros, estados y curvas actualizados con éxito!")
             st.rerun()
 
         st.divider()
-        csv_data = df_reg.to_csv(index=False).encode('utf-8')
+        
+        # Gráfica de Curva de Capital (Equity Curve)
+        st.subheader("Curva de Capital (Equity Curve)")
+        df_resueltas = st.session_state.registro_apuestas[st.session_state.registro_apuestas["Resultado"] != "Pendiente"].copy()
+        if not df_resueltas.empty:
+            df_resueltas["Capital Acumulado"] = st.session_state.bankroll_inicial + df_resueltas["Ganancia ($)"].cumsum()
+            st.line_chart(df_resueltas["Capital Acumulado"])
+        else:
+            st.info("Resuelve al menos una orden (Ganada/Perdida) para visualizar la curva de crecimiento del capital.")
+
+        st.divider()
+        csv_data = st.session_state.registro_apuestas.to_csv(index=False).encode('utf-8')
         st.download_button(
             label="Descargar Registro Completo (CSV / Excel)",
             data=csv_data,
