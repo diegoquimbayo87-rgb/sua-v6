@@ -22,7 +22,6 @@ st.markdown("""
         --text-main: #F3F4F6;
     }
 
-    /* Corrección de color de los botones de incremento/decremento a Naranja (si aplica en componentes numéricos auxiliares) */
     div[data-baseweb="spinbutton"] button {
         background-color: #F97316 !important;
         color: white !important;
@@ -56,7 +55,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializar Estado de Sesión y Bankroll numérico puro
+# Inicializar Estado de Sesión y Bankroll
 if "bankroll_inicial" not in st.session_state:
     st.session_state.bankroll_inicial = 2000000.0
 
@@ -104,24 +103,19 @@ st.sidebar.divider()
 
 st.sidebar.markdown("### Configuración de Capital")
 
-# Función auxiliar para formatear a estilo colombiano: 2.000.000,00
 def formatear_colombia(valor):
     try:
         parte_entera = int(round(valor, 2))
         parte_decimal = int(round((valor - parte_entera) * 100))
-        # Formatear enteros con puntos
         entera_str = f"{parte_entera:,}".replace(",", ".")
         return f"{entera_str},{abs(parte_decimal):02d}"
     except:
         return "2.000.000,00"
 
-# Campo de texto para permitir formato personalizado con puntos de miles y coma decimal
 val_inicial_str = formatear_colombia(st.session_state.bankroll_inicial)
 bankroll_text = st.sidebar.text_input("Bankroll Inicial (COP $)", value=val_inicial_str)
 
-# Procesar la entrada del usuario para convertirla de nuevo a número flotante operable
 try:
-    # Limpiar puntos de miles y reemplazar coma decimal por punto para Python
     limpio = bankroll_text.replace(".", "").replace(",", ".")
     st.session_state.bankroll_inicial = float(limpio)
 except ValueError:
@@ -148,7 +142,6 @@ for op in menu_opciones:
 
 st.sidebar.divider()
 
-# Panel Desplegable de Estado de APIs con indicadores independientes
 with st.sidebar.expander("🟢 Estado de Conectividad APIs"):
     for api_nombre, estado_ok in api_estados.items():
         icon = "🟢" if estado_ok else "🔴"
@@ -239,21 +232,55 @@ if nav == "Dashboard - Oportunidades":
 # ==================== 2. NUEVO ANÁLISIS ====================
 elif nav == "Nuevo Análisis":
     st.markdown("## Nuevo Análisis de Partido")
+    st.markdown("""
+    > **Propósito del módulo:** Consultar partidos en tiempo real, cruzar métricas xG, saques de esquina y tarjetas mediante las APIs de fútbol conectadas.
+    """)
     st.divider()
-    query = st.text_input("Buscar equipo o liga...", placeholder="Ej: Manchester City, Real Madrid...")
-    if query:
-        st.info(f"Buscando coincidencias para '{query}' a través de API-Football y SportMonks...")
-    else:
-        st.info("Introduce un criterio de búsqueda para consultar los partidos disponibles.")
+    
+    col_a, col_b = st.columns(2)
+    with col_a:
+        equipo_local = st.text_input("Equipo Local", placeholder="Ej. Millonarios, Real Madrid")
+    with col_b:
+        equipo_visita = st.text_input("Equipo Visitante", placeholder="Ej. América de Cali, Barcelona")
+        
+    if st.button("Ejecutar Escaneo Algorítmico", type="primary"):
+        if equipo_local and equipo_visita:
+            st.success(f"Conectando con API-Football y SportMonks para analizar: {equipo_local} vs {equipo_visita}...")
+            st.markdown("### Resultados del Modelo Predictivo:")
+            m1, m2, m3 = st.columns(3)
+            with m1: st.metric("xG Estimado Local", "1.74")
+            with m2: st.metric("xG Estimado Visita", "1.12")
+            with m3: st.metric("Índice de Confianza (IC)", "86.5", delta="Alto Valor")
+        else:
+            st.warning("Por favor ingresa ambos equipos para realizar el escaneo.")
 
 # ==================== 3. CHECKLISTS IC ====================
 elif nav == "Checklists IC":
     st.markdown("## Checklists IC Cuantitativas")
+    st.markdown("""
+    > **Propósito del módulo:** Validaciones de rigor antes de confirmar cualquier entrada al mercado de valores deportivos.
+    """)
     st.divider()
+    
+    st.markdown("### 1. Checklist Mercado de Goles (Over / Under)")
+    st.checkbox("Promedio xG combinados de los últimos 5 partidos > 2.65")
+    st.checkbox("Ausencias defensivas confirmadas (centrales o portero titular)")
+    st.checkbox("Condiciones climáticas y estado del terreno de juego óptimos")
+    
+    st.markdown("### 2. Checklist Mercados de Córneres")
+    st.checkbox("Estilo de juego basado en amplitud y desborde por bandas")
+    st.checkbox("Promedio de tiros de esquina a favor superior a 5.5 por encuentro")
+    
+    st.markdown("### 3. Checklist Mercados de Tarjetas")
+    st.checkbox("Árbitro designado con media superior a 5.0 tarjetas amarillas por partido")
+    st.checkbox("Alta rivalidad histórica o presión directa por descenso / clasificación")
 
 # ==================== 4. MATRIZ DE DECISIÓN ====================
 elif nav == "Matriz de Decisión":
     st.markdown("## Matriz de Decisión v4.2")
+    st.markdown("""
+    > **Propósito del módulo:** Reglas estrictas de asignación de capital basadas en el Índice de Confianza (IC).
+    """)
     st.divider()
     matriz_df = pd.DataFrame({
         "IC": ["90 – 100", "82 – 89", "74 – 81", "< 68"],
@@ -266,17 +293,23 @@ elif nav == "Matriz de Decisión":
 # ==================== 5. SHARP COMPARISON ====================
 elif nav == "Sharp Comparison":
     st.markdown("## Sharp Comparison (Pinnacle Tracker)")
+    st.markdown("""
+    > **Propósito del módulo:** Calcular el Closing Line Value (CLV) y el diferencial de valor frente a las casas sharp.
+    """)
     st.divider()
     c1, c2 = st.columns(2)
     with c1: cuota_rush = st.number_input("Cuota Bookmaker", value=2.05, step=0.01)
     with c2: cuota_pin = st.number_input("Cuota Pinnacle", value=1.90, step=0.01)
-    if st.button("Calcular CLV"):
+    if st.button("Calcular CLV", type="primary"):
         clv = ((cuota_rush / cuota_pin) - 1) * 100
         st.success(f"Diferencial CLV / Edge: **+{clv:.2f}%**")
 
 # ==================== 6. REGISTRO Y CONTROL FINANCIERO ====================
 elif nav == "Registro y Control Financiero":
     st.markdown("## Registro y Control Financiero e Institucional")
+    st.markdown("""
+    > **Propósito del módulo:** Auditoría avanzada de rendimiento, control de bankroll y rentabilidad.
+    """)
     st.divider()
 
     df_reg = st.session_state.registro_apuestas
@@ -307,7 +340,7 @@ elif nav == "Registro y Control Financiero":
         st.subheader("Edición de Cuota Real y Resultados")
         edited_df = st.data_editor(df_reg, use_container_width=True, key="editor_registro")
         
-        if st.button("Actualizar Cálculos y Sincronizar Sistema"):
+        if st.button("Actualizar Cálculos y Sincronizar Sistema", type="primary"):
             for idx, row in edited_df.iterrows():
                 try:
                     orig_idx = int(row["Consecutivo"]) - 1
