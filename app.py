@@ -2,81 +2,75 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
-st.set_page_config(page_title="SÚA v6.2 — Terminal Cuantitativa", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="SÚA v6.3 — Terminal Cuantitativa", layout="wide", initial_sidebar_state="expanded")
 
 # ==================== CREDENCIALES DE API ====================
 API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"
 THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"
 SPORTMONKS_KEY = "Aul9KNwcdeGqtmwHRR7VpUUQPxL7n2a3LmBqxEcwo1lOAhSJhAf1aYaZgkU9"
 
-# ==================== ESTILOS CSS (DISEÑO MODERNO, CERO ROJOS NO DESEADOS) ====================
+# ==================== ESTILOS CSS PROFESIONALES (CERO ROJOS, BOTONES SÓLIDOS) ====================
 st.markdown("""
 <style>
-    /* Estilo general y tipografía */
     .main {background-color: #0E1117;}
     
-    /* Botones de navegación personalizados en la barra lateral */
-    div.stRadio > label {visibility: hidden; height: 0px;}
-    div.stRadio > div {
-        gap: 8px;
-    }
-    div.stRadio label div[data-testid="stMarkdownContainer"] p {
-        font-size: 1rem;
-        font-weight: 600;
+    /* Forzar diseño limpio y elegante en toda la interfaz */
+    :root {
+        --primary: #F97316;
+        --bg-dark: #0E1117;
+        --card-bg: #1F2937;
+        --text-main: #F3F4F6;
     }
 
-    /* Ocultar elementos molestos y sustituir acentos de Streamlit por Naranja Profesional / Azul */
-    :root {
-        --primary-color: #F97316;
-        --background-color: #0E1117;
-        --secondary-background-color: #1F2937;
-        --text-color: #F3F4F6;
-    }
+    /* Eliminar cualquier sombra o color rojo indeseado de Streamlit */
+    input[type="radio"] {accent-color: #F97316 !important;}
     
-    /* Contenedores con estilo tarjeta moderna */
-    .card-container {
+    /* Contenedor de tarjetas ejecutivas */
+    .executive-card {
         background-color: #1F2937;
-        padding: 20px;
+        padding: 24px;
         border-radius: 12px;
         border: 1px solid #374151;
-        margin-bottom: 15px;
-    }
-    
-    .metric-card {
-        background-color: #111827;
-        padding: 15px;
-        border-radius: 8px;
-        border-left: 4px solid #F97316;
-        text-align: center;
+        margin-bottom: 20px;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializar Estado de Sesión para Órdenes y Registro
+# Inicializar Estado de Sesión
 if "registro_apuestas" not in st.session_state:
     st.session_state.registro_apuestas = pd.DataFrame(columns=[
         "Consecutivo", "Fecha", "Hora", "Liga", "Torneo", "Partido", "Mercado", "IC", 
         "Cuota Proyectada", "Cuota Real Apostada", "Inversión ($)", "Edge Real", "Decisión", "Stake", "Resultado", "Ganancia ($)"
     ])
 
-# ==================== SIDEBAR ====================
-st.sidebar.markdown("## **SÚA v6.2**")
+if "nav_active" not in st.session_state:
+    st.session_state.nav_active = "Dashboard - Oportunidades"
+
+if "tab_active" not in st.session_state:
+    st.session_state.tab_active = "hoy"
+
+# ==================== SIDEBAR: BOTONES SÓLIDOS DE NAVEGACIÓN ====================
+st.sidebar.markdown("## **SÚA v6.3**")
 st.sidebar.caption("Terminal Cuantitativa — Bogotá")
 st.sidebar.divider()
 
 st.sidebar.markdown("### Módulos Operativos")
-nav = st.sidebar.radio(
-    "Navegación", 
-    [
-        "Dashboard - Oportunidades",
-        "Nuevo Análisis",
-        "Checklists IC",
-        "Matriz de Decisión",
-        "Sharp Comparison",
-        "Registro y Control Financiero"
-    ],
-    label_visibility="collapsed"
-)
+
+menu_opciones = [
+    "Dashboard - Oportunidades",
+    "Nuevo Análisis",
+    "Checklists IC",
+    "Matriz de Decisión",
+    "Sharp Comparison",
+    "Registro y Control Financiero"
+]
+
+for op in menu_opciones:
+    is_selected = (st.session_state.nav_active == op)
+    button_type = "primary" if is_selected else "secondary"
+    if st.sidebar.button(op, use_container_width=True, type=button_type):
+        st.session_state.nav_active = op
+        st.rerun()
 
 st.sidebar.divider()
 st.sidebar.markdown(
@@ -84,17 +78,29 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
+nav = st.session_state.nav_active
+
 # ==================== 1. DASHBOARD - OPORTUNIDADES ====================
 if nav == "Dashboard - Oportunidades":
-    st.markdown("## 📊 Dashboard de Oportunidades Algorítmicas")
+    st.markdown("## Dashboard de Oportunidades Algorítmicas")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Muestra en tiempo real las mejores oportunidades detectadas por el motor cuantitativo de SÚA. 
-    > Aquí el sistema filtra las 10 mejores opciones del día actual y las 5 principales para el día siguiente, evaluando de forma rigurosa 
-    > el Índice de Convicción (IC) y el Edge matemático frente a Pinnacle.
+    > **Propósito del módulo:** Visualización en tiempo real de las mejores oportunidades detectadas por el motor cuantitativo de SÚA. 
+    > Filtra de manera rigurosa las 10 mejores opciones del día actual y las 5 principales para la jornada siguiente, evaluando el Índice de Convicción (IC) y el Edge frente a Pinnacle.
     """)
     st.divider()
 
-    tab_hoy, tab_mañana = st.tabs(["📅 Hoy (23 Julio - Top 10 Oportunidades)", "⏭️ Mañana (24 Julio - Top 5 Oportunidades)"])
+    # Botones sólidos personalizados para las sub-pestañas (Evitando rojo de Streamlit)
+    col_t1, col_t2, _ = st.columns([2, 2, 3])
+    with col_t1:
+        if st.button("📅 Hoy (23 Julio - Top 10)", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
+            st.session_state.tab_active = "hoy"
+            st.rerun()
+    with col_t2:
+        if st.button("⏭️ Mañana (24 Julio - Top 5)", use_container_width=True, type="primary" if st.session_state.tab_active=="mañana" else "secondary"):
+            st.session_state.tab_active = "mañana"
+            st.rerun()
+
+    st.markdown("<br>", unsafe_allow_html=True)
 
     opps_hoy = [
         {"id": 1, "hora": "14:00", "liga": "Premier League", "torneo": "Temporada Regular", "partido": "Manchester City vs Arsenal", "mercado": "Over 2.5 Goles", "cuota": 2.15, "pin": 2.02, "ic": 92, "edge": 11.2, "dec": "APOSTAR FUERTE", "stake": "3.5%", "trend": [1.95, 2.00, 2.08, 2.15]},
@@ -117,8 +123,8 @@ if nav == "Dashboard - Oportunidades":
         {"id": 105, "hora": "21:30", "liga": "MLS", "torneo": "Conferencia Este/Oeste", "partido": "LA Galaxy vs LAFC", "mercado": "Over 3.5 Goles", "cuota": 2.35, "pin": 2.15, "ic": 80, "edge": 9.3, "dec": "APOSTAR MODERADO", "stake": "1.5%", "trend": [2.20, 2.25, 2.30, 2.35]}
     ]
 
-    with tab_hoy:
-        st.subheader("Top 10 Oportunidades de Hoy")
+    if st.session_state.tab_active == "hoy":
+        st.subheader("Top 10 Oportunidades del Día (Ordenadas por Convicción y Edge)")
         for opp in opps_hoy:
             with st.expander(f"#{opp['id']} — {opp['hora']} | {opp['partido']} | {opp['mercado']} (IC: {opp['ic']} | Edge: +{opp['edge']}%)"):
                 c1, c2, c3, c4, c5 = st.columns(5)
@@ -131,11 +137,10 @@ if nav == "Dashboard - Oportunidades":
                     st.markdown(f"**Stake:** `{opp['stake']}`")
                 
                 st.markdown("---")
-                st.markdown("📈 **Evolución Histórica de la Cuota:**")
+                st.markdown("📈 **Evolución Histórica de la Cuota (Mercado):**")
                 st.line_chart(opp['trend'])
                 
-                # Botón rápido para convertir esta oportunidad en Orden de Apuesta
-                if st.button(f"📥 Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_hoy_{opp['id']}"):
+                if st.button(f"Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_hoy_{opp['id']}"):
                     nuevo_reg = {
                         "Consecutivo": len(st.session_state.registro_apuestas) + 1,
                         "Fecha": "2026-07-23",
@@ -146,7 +151,7 @@ if nav == "Dashboard - Oportunidades":
                         "Mercado": opp['mercado'],
                         "IC": opp['ic'],
                         "Cuota Proyectada": opp['cuota'],
-                        "Cuota Real Apostada": opp['cuota'], # Por defecto trae la misma, editable abajo
+                        "Cuota Real Apostada": opp['cuota'],
                         "Inversión ($)": 50000,
                         "Edge Real": f"+{opp['edge']}%",
                         "Decisión": opp['dec'],
@@ -155,9 +160,8 @@ if nav == "Dashboard - Oportunidades":
                         "Ganancia ($)": 0.0
                     }
                     st.session_state.registro_apuestas = pd.concat([st.session_state.registro_apuestas, pd.DataFrame([nuevo_reg])], ignore_index=True)
-                    st.success(f"¡Orden creada con éxito para {opp['partido']}! Ve al módulo de Registro para ajustar tu cuota real.")
-
-    with tab_mañana:
+                    st.success(f"Orden creada con éxito para {opp['partido']}.")
+    else:
         st.subheader("Top 5 Oportunidades del Día Siguiente")
         for opp in opps_mañana:
             with st.expander(f"#{opp['id']} — 24 Jul {opp['hora']} | {opp['partido']} | {opp['mercado']} (IC: {opp['ic']} | Edge: +{opp['edge']}%)"):
@@ -171,10 +175,10 @@ if nav == "Dashboard - Oportunidades":
                     st.markdown(f"**Stake:** `{opp['stake']}`")
                 
                 st.markdown("---")
-                st.markdown("📈 **Evolución Histórica de la Cuota:**")
+                st.markdown("📈 **Evolución Histórica de la Cuota (Mercado):**")
                 st.line_chart(opp['trend'])
                 
-                if st.button(f"📥 Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_man_{opp['id']}"):
+                if st.button(f"Enviar a Órdenes / Registro (ID: {opp['id']})", key=f"btn_man_{opp['id']}"):
                     nuevo_reg = {
                         "Consecutivo": len(st.session_state.registro_apuestas) + 1,
                         "Fecha": "2026-07-24",
@@ -194,19 +198,17 @@ if nav == "Dashboard - Oportunidades":
                         "Ganancia ($)": 0.0
                     }
                     st.session_state.registro_apuestas = pd.concat([st.session_state.registro_apuestas, pd.DataFrame([nuevo_reg])], ignore_index=True)
-                    st.success(f"¡Orden creada con éxito para {opp['partido']}! Ve al módulo de Registro para ajustar tu cuota real.")
+                    st.success(f"Orden creada con éxito para {opp['partido']}.")
 
 # ==================== 2. NUEVO ANÁLISIS ====================
 elif nav == "Nuevo Análisis":
-    st.markdown("## 🔍 Nuevo Análisis de Partido")
+    st.markdown("## Nuevo Análisis de Partido")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Permite realizar un escaneo y validación puntual de cualquier encuentro deportivo. 
-    > Puedes utilizar la barra de búsqueda rápida por el nombre del equipo para filtrar de inmediato en las APIs conectadas (API-Football, The Odds API y SportMonks) 
-    > sin necesidad de navegar por largas listas de ligas.
+    > **Propósito del módulo:** Búsqueda y validación puntual en caliente. Permite buscar directamente introduciendo el nombre 
+    > de un equipo para consultar las APIs conectadas (API-Football, The Odds API y SportMonks) sin necesidad de recorrer listados extensos.
     """)
     st.divider()
 
-    # Base de datos simulada de partidos disponibles para búsqueda rápida por nombre
     partidos_db = [
         {"partido": "Manchester City vs Arsenal", "liga": "Premier League", "torneo": "Temporada Regular"},
         {"partido": "Liverpool vs Chelsea", "liga": "Premier League", "torneo": "Temporada Regular"},
@@ -217,9 +219,8 @@ elif nav == "Nuevo Análisis":
         {"partido": "Bayern vs Dortmund", "liga": "Bundesliga", "torneo": "Fútbol Alemán"}
     ]
 
-    query_equipo = st.text_input("🔍 Búsqueda rápida por Nombre de Equipo (Ej: City, Real Madrid, River, Napoli)", placeholder="Escribe el nombre del equipo...")
+    query_equipo = st.text_input("Búsqueda rápida por Nombre de Equipo (Ej: City, Real Madrid, River, Napoli)", placeholder="Escribe el nombre del equipo...")
 
-    # Filtrar partidos según la búsqueda
     if query_equipo:
         resultados_filtrados = [p for p in partidos_db if query_equipo.lower() in p["partido"].lower() or query_equipo.lower() in p["liga"].lower()]
     else:
@@ -229,12 +230,12 @@ elif nav == "Nuevo Análisis":
         partido_seleccionado = st.selectbox("Seleccionar Partido Encontrado", [p["partido"] for p in resultados_filtrados])
         info_partido = next(p for p in resultados_filtrados if p["partido"] == partido_seleccionado)
         
-        st.info(f"Liga Detectada: **{info_partido['liga']}** | Torneo: **{info_partido['torneo']}**")
+        st.info(f"Liga: **{info_partido['liga']}** | Torneo: **{info_partido['torneo']}**")
         
-        mercado = st.selectbox("Seleccionar Mercado a Evaluar", ["Over / Under Goles", "Córneres", "Tarjetas"])
+        mercado = st.selectbox("Seleccionar Mercado", ["Over / Under Goles", "Córneres", "Tarjetas"])
         
         ic_total = 0
-        st.markdown("#### Evaluación de Criterios Paramétricos (Checklist IC)")
+        st.markdown("#### Evaluación de Criterios Paramétricos")
         
         if mercado == "Over / Under Goles":
             c1 = st.checkbox("xG combinado > 3.40 (+30 pts)")
@@ -275,7 +276,7 @@ elif nav == "Nuevo Análisis":
         st.divider()
         r1, r2 = st.columns(2)
         with r1:
-            st.metric("Índice de Convicción Calculado (IC)", f"{ic_total} / 100")
+            st.metric("Índice de Convicción (IC)", f"{ic_total} / 100")
         with r2:
             cuota_rushbet = st.number_input("Cuota proyectada en Rushbet", value=2.10, step=0.01)
             cuota_pinnacle = st.number_input("Cuota de referencia Pinnacle", value=1.95, step=0.01)
@@ -283,7 +284,7 @@ elif nav == "Nuevo Análisis":
         edge_calc = ((cuota_rushbet / cuota_pinnacle) - 1) * 100 if cuota_pinnacle > 0 else 0
         st.info(f"Edge Estimado vs Pinnacle: **+{edge_calc:.2f}%**")
 
-        if st.button("🚀 Registrar Orden y Enviar a Control Financiero"):
+        if st.button("Registrar Orden y Enviar a Control Financiero"):
             decision = "APOSTAR" if ic_total >= 80 else "MODERADO"
             stake = "2.5%" if ic_total >= 80 else "1.5%"
             
@@ -312,44 +313,31 @@ elif nav == "Nuevo Análisis":
 
 # ==================== 3. CHECKLISTS IC ====================
 elif nav == "Checklists IC":
-    st.markdown("## 📋 Checklists IC Cuantitativas")
+    st.markdown("## Checklists IC Cuantitativas")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Documenta los parámetros de ponderación oficiales vigentes en SÚA v6.2. 
-    > Utiliza esta guía para entender exactamente cómo se asigna el puntaje de Convicción (IC) en cada mercado antes de ejecutar una orden.
+    > **Propósito del módulo:** Documentación de referencia para los parámetros de ponderación vigentes. 
+    > Explica con rigor analítico cómo se construye el puntaje de Convicción (IC) para cada mercado evaluado.
     """)
     st.divider()
 
-    tab1, tab2, tab3 = st.tabs(["⚽ Over / Under Goles", "🚩 Córneres", "🟨 Tarjetas"])
-    
-    with tab1:
-        st.markdown("### Parámetros para Mercado de Goles")
-        st.markdown("* **xG combinado > 3.40:** Otorga **30 pts** (Indica alta probabilidad ofensiva).")
-        st.markdown("* **Regresión (Goles - xG) > 0.4:** Otorga **25 pts** (Desajuste estadístico favorable).")
-        st.markdown("* **% Over 2.5 últimos 8 PJ > 62%:** Otorga **20 pts** (Inercia de anotación reciente).")
-        st.markdown("* **Motivación alta:** Otorga **15 pts** (Necesidad imperiosa de sumar de a tres).")
-        st.markdown("* **Sin lesiones clave:** Otorga **10 pts** (Alineaciones titulares confirmadas).")
-        
-    with tab2:
-        st.markdown("### Parámetros para Mercado de Córneres")
-        st.markdown("* **Centros + ataques por banda > 24:** Otorga **30 pts**.")
-        st.markdown("* **Remates bloqueados + PPDA bajo:** Otorga **25 pts**.")
-        st.markdown("* **Estilo vertical:** Otorga **20 pts**.")
-        st.markdown("* **Necesidad de remontar:** Otorga **15 pts**.")
-        st.markdown("* **Historial H2H favorable:** Otorga **10 pts**.")
-        
-    with tab3:
-        st.markdown("### Parámetros para Mercado de Tarjetas")
-        st.markdown("* **Árbitro estricto (> 5.0 tarjetas promedio):** Otorga **30 pts**.")
-        st.markdown("* **Faltas promedio por equipo > 22:** Otorga **25 pts**.")
-        st.markdown("* **Alta intensidad / Rivalidad regional o derbi:** Otorga **20 pts**.")
-        st.markdown("* **Contexto emocional en la tabla:** Otorga **15 pts**.")
-        st.markdown("* **Historial H2H friccionado:** Otorga **10 pts**.")
+    col_chk1, col_chk2, col_chk3 = st.columns(3)
+    with col_chk1:
+        st.markdown("### Goles")
+        st.markdown("* **xG combinado > 3.40:** 30 pts\n* **Regresión > 0.4:** 25 pts\n* **% Over > 62%:** 20 pts\n* **Motivación alta:** 15 pts\n* **Sin lesiones:** 10 pts")
+    with col_chk2:
+        st.markdown("### Córneres")
+        st.markdown("* **Ataques banda > 24:** 30 pts\n* **Remates blfeq + PPDA:** 25 pts\n* **Estilo vertical:** 20 pts\n* **Remontada:** 15 pts\n* **H2H favorable:** 10 pts")
+    with col_chk3:
+        st.markdown("### Tarjetas")
+        st.markdown("* **Árbitro > 5.0:** 30 pts\n* **Faltas equipo > 22:** 25 pts\n* **Derbi / Rivalidad:** 20 pts\n* **Contexto tabla:** 15 pts\n* **H2H fricción:** 10 pts")
 
 # ==================== 4. MATRIZ DE DECISIÓN ====================
+elif nav == "Matriz de Decision":
+    pass # Replaced below properly
 elif nav == "Matriz de Decisión":
-    st.markdown("## 📐 Matriz de Decisión v4.2")
+    st.markdown("## Matriz de Decisión v4.2")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Establece las reglas estrictas de ejecución y dimensionamiento de riesgo financiero en función 
+    > **Propósito del módulo:** Reglas estrictas de ejecución y dimensionamiento de riesgo financiero en función 
     > del Índice de Convicción (IC) y el Edge calculado frente a las casas agudas.
     """)
     st.divider()
@@ -367,10 +355,10 @@ elif nav == "Matriz de Decisión":
 
 # ==================== 5. SHARP COMPARISON ====================
 elif nav == "Sharp Comparison":
-    st.markdown("## ⚖️ Sharp Comparison (Pinnacle Tracker)")
+    st.markdown("## Sharp Comparison (Pinnacle Tracker)")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Módulo de validación de cuotas de cierre frente a Pinnacle para calcular el CLV (Closing Line Value) 
-    > real y comprobar si la cuota tomada posee el valor matemático necesario para garantizar rentabilidad a largo plazo.
+    > **Propósito del módulo:** Módulo de validación de cuotas de cierre frente a Pinnacle para calcular el CLV (Closing Line Value) 
+    > y determinar si la cuota tomada posee el valor matemático adecuado para asegurar rentabilidad a largo plazo.
     """)
     st.divider()
     
@@ -393,18 +381,17 @@ elif nav == "Sharp Comparison":
 
 # ==================== 6. REGISTRO Y CONTROL FINANCIERO ====================
 elif nav == "Registro y Control Financiero":
-    st.markdown("## 📂 Registro y Control Financiero de Órdenes")
+    st.markdown("## Registro y Control Financiero de Órdenes")
     st.markdown("""
-    > **¿Para qué sirve esta sección?** Es el panel central de auditoría y rendimiento de la aplicación. Muestra el total de órdenes aceptadas, 
-    > oportunidades ganadas por el modelo y el rendimiento financiero detallado por liga, torneo y mercado. 
-    > Aquí puedes ingresar la cuota real con la que apostaste y descargar el reporte completo.
+    > **Propósito del módulo:** Centro neurálgico de auditoría y rendimiento operativo. Muestra el total de órdenes aceptadas, 
+    > oportunidades generadas por el modelo, y permite ingresar la cuota real apostada para medir con precisión las ganancias/pérdidas 
+    > y exportar el reporte en formato descargable.
     """)
     st.divider()
 
     df_reg = st.session_state.registro_apuestas
 
     if not df_reg.empty:
-        # Métricas superiores financieras
         total_ordenes = len(df_reg)
         ganadas = len(df_reg[df_reg["Resultado"] == "Ganada"])
         perdidas = len(df_reg[df_reg["Resultado"] == "Perdida"])
@@ -417,14 +404,12 @@ elif nav == "Registro y Control Financiero":
         with m4: st.metric("Órdenes Pendientes", pendientes)
         
         st.divider()
-        st.subheader("⚙️ Edición y Actualización de Resultados / Cuota Real")
-        st.markdown("Selecciona una fila o ajusta la cuota real con la que operaste, junto con el resultado final (Ganada/Perdida):")
+        st.subheader("Auditoría y Edición de Cuota Real / Resultados")
+        st.markdown("Actualiza aquí la **Cuota Real Apostada** y el **Resultado** (`Ganada` / `Perdida`) para calcular de forma automática la rentabilidad:")
 
-        # Editor interactivo de la tabla para actualizar la cuota real y resultados
         edited_df = st.data_editor(df_reg, use_container_width=True, key="editor_registro")
         
-        # Botón para guardar cambios y recalcular ganancias
-        if st.button("💾 Actualizar Cálculos y Ganancias Financieras"):
+        if st.button("Actualizar Cálculos Financieros"):
             for idx, row in edited_df.iterrows():
                 try:
                     cuota_real = float(row["Cuota Real Apostada"])
@@ -443,10 +428,9 @@ elif nav == "Registro y Control Financiero":
             st.rerun()
 
         st.divider()
-        # Botón de Descarga
         csv_data = df_reg.to_csv(index=False).encode('utf-8')
         st.download_button(
-            label="📥 Descargar Registro Completo (CSV / Excel)",
+            label="Descargar Registro Completo (CSV / Excel)",
             data=csv_data,
             file_name=f"SUA_Registro_Apuestas_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
             mime="text/csv",
