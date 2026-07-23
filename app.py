@@ -242,7 +242,7 @@ if nav_tab == "📊 Top 10 Oportunidades":
         {"Partido":"Manchester City vs Arsenal","Liga":"Premier League","Mercado":"Gana Manchester City","Cuota":2.10,"Prob_Real":0.52,"Edge":9.2,"IC":85,"Estado":"Muy Alta"},
         {"Partido":"Millonarios vs Independiente Santa Fe","Liga":"Liga BetPlay","Mercado":"Menos de 2.5 Goles","Cuota":1.80,"Prob_Real":0.61,"Edge":9.8,"IC":87,"Estado":"Muy Alta"},
         {"Partido":"Bayern Munich vs Dortmund","Liga":"Champions League","Mercado":"Más de 3.25 Goles Asiáticos","Cuota":1.90,"Prob_Real":0.57,"Edge":8.3,"IC":84,"Estado":"Muy Alta"},
-        {"Partido":"Liverpool vs Chelsea","Liga":"Premier League","Mercado":"Más de 4.5 Tarjetas","Cuota":2.05,"Prob_Real":0.54,"Edge":10.7,"IC":89,"Excelente"},
+        {"Partido":"Liverpool vs Chelsea","Liga":"Premier League","Mercado":"Más de 4.5 Tarjetas","Cuota":2.05,"Prob_Real":0.54,"Edge":10.7,"IC":89,"Estado":"Excelente"},
     ]
     df_top10 = pd.DataFrame(top_10_data)
     st.dataframe(df_top10, use_container_width=True)
