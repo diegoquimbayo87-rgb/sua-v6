@@ -84,7 +84,7 @@ menu_opciones = [
 for op in menu_opciones:
     is_selected = (st.session_state.nav_active == op)
     button_type = "primary" if is_selected else "secondary"
-    if st.sidebar.button(op, use_container_width=True, type=button_type):
+    if st.sidebar.button(op, key=f"nav_menu_{op}", use_container_width=True, type=button_type):
         st.session_state.nav_active = op
         st.rerun()
 
@@ -105,14 +105,13 @@ if nav == "Dashboard - Oportunidades":
     """)
     st.divider()
 
-    # Botones sólidos personalizados para las sub-pestañas
     col_t1, col_t2, _ = st.columns([2, 2, 3])
     with col_t1:
-        if st.button("Hoy (23 Julio - Top 10)", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
+        if st.button("Hoy (23 Julio - Top 10)", key="tab_hoy_btn", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
             st.session_state.tab_active = "hoy"
             st.rerun()
     with col_t2:
-        if st.button("Mañana (24 Julio - Top 5)", use_container_width=True, type="primary" if st.session_state.tab_active=="mañana" else "secondary"):
+        if st.button("Mañana (24 Julio - Top 5)", key="tab_manana_btn", use_container_width=True, type="primary" if st.session_state.tab_active=="mañana" else "secondary"):
             st.session_state.tab_active = "mañana"
             st.rerun()
 
@@ -254,11 +253,11 @@ elif nav == "Nuevo Análisis":
         st.markdown("#### Evaluación de Criterios Paramétricos")
         
         if mercado == "Over / Under Goles":
-            c1 = st.checkbox("xG combinado > 3.40 (+30 pts)")
-            c2 = st.checkbox("Regresión (Goles - xG) > 0.4 (+25 pts)")
-            c3 = st.checkbox("% Over 2.5 últimos 8 PJ > 62% (+20 pts)")
-            c4 = st.checkbox("Motivación alta / Necesidad de puntos (+15 pts)")
-            c5 = st.checkbox("Sin lesiones clave en ofensiva (+10 pts)")
+            c1 = st.checkbox("xG combinado > 3.40 (+30 pts)", key="g1")
+            c2 = st.checkbox("Regresión (Goles - xG) > 0.4 (+25 pts)", key="g2")
+            c3 = st.checkbox("% Over 2.5 últimos 8 PJ > 62% (+20 pts)", key="g3")
+            c4 = st.checkbox("Motivación alta / Necesidad de puntos (+15 pts)", key="g4")
+            c5 = st.checkbox("Sin lesiones clave en ofensiva (+10 pts)", key="g5")
             if c1: ic_total += 30
             if c2: ic_total += 25
             if c3: ic_total += 20
@@ -266,11 +265,11 @@ elif nav == "Nuevo Análisis":
             if c5: ic_total += 10
 
         elif mercado == "Córneres":
-            c1 = st.checkbox("Centros + ataques por banda > 24 (+30 pts)")
-            c2 = st.checkbox("Remates bloqueados + PPDA bajo (+25 pts)")
-            c3 = st.checkbox("Estilo de juego vertical (+20 pts)")
-            c4 = st.checkbox("Necesidad de remontar / Partido abierto (+15 pts)")
-            c5 = st.checkbox("Historial H2H favorable (+10 pts)")
+            c1 = st.checkbox("Centros + ataques por banda > 24 (+30 pts)", key="cor1")
+            c2 = st.checkbox("Remates bloqueados + PPDA bajo (+25 pts)", key="cor2")
+            c3 = st.checkbox("Estilo de juego vertical (+20 pts)", key="cor3")
+            c4 = st.checkbox("Necesidad de remontar / Partido abierto (+15 pts)", key="cor4")
+            c5 = st.checkbox("Historial H2H favorable (+10 pts)", key="cor5")
             if c1: ic_total += 30
             if c2: ic_total += 25
             if c3: ic_total += 20
@@ -278,11 +277,11 @@ elif nav == "Nuevo Análisis":
             if c5: ic_total += 10
 
         elif mercado == "Tarjetas":
-            c1 = st.checkbox("Árbitro estricto (> 5.0 tarjetas promedio) (+30 pts)")
-            c2 = st.checkbox("Faltas promedio por equipo > 22 (+25 pts)")
-            c3 = st.checkbox("Alta intensidad / Rivalidad o Derbi (+20 pts)")
-            c4 = st.checkbox("Contexto emocional en tabla de posiciones (+15 pts)")
-            c5 = st.checkbox("Historial H2H friccionado (+10 pts)")
+            c1 = st.checkbox("Árbitro estricto (> 5.0 tarjetas promedio) (+30 pts)", key="tar1")
+            c2 = st.checkbox("Faltas promedio por equipo > 22 (+25 pts)", key="tar2")
+            c3 = st.checkbox("Alta intensidad / Rivalidad o Derbi (+20 pts)", key="tar3")
+            c4 = st.checkbox("Contexto emocional en tabla de posiciones (+15 pts)", key="tar4")
+            c5 = st.checkbox("Historial H2H friccionado (+10 pts)", key="tar5")
             if c1: ic_total += 30
             if c2: ic_total += 25
             if c3: ic_total += 20
@@ -294,13 +293,13 @@ elif nav == "Nuevo Análisis":
         with r1:
             st.metric("Índice de Convicción (IC)", f"{ic_total} / 100")
         with r2:
-            cuota_rushbet = st.number_input("Cuota proyectada en Rushbet", value=2.10, step=0.01)
-            cuota_pinnacle = st.number_input("Cuota de referencia Pinnacle", value=1.95, step=0.01)
+            cuota_rushbet = st.number_input("Cuota proyectada en Rushbet", value=2.10, step=0.01, key="cuota_proj_nuevo")
+            cuota_pinnacle = st.number_input("Cuota de referencia Pinnacle", value=1.95, step=0.01, key="cuota_pin_nuevo")
 
         edge_calc = ((cuota_rushbet / cuota_pinnacle) - 1) * 100 if cuota_pinnacle > 0 else 0
         st.info(f"Edge Estimado vs Pinnacle: **+{edge_calc:.2f}%**")
 
-        if st.button("Registrar Orden y Enviar a Control Financiero"):
+        if st.button("Registrar Orden y Enviar a Control Financiero", key="btn_registrar_nuevo"):
             decision = "APOSTAR" if ic_total >= 80 else "MODERADO"
             stake = "2.5%" if ic_total >= 80 else "1.5%"
             
@@ -378,14 +377,14 @@ elif nav == "Sharp Comparison":
     
     col1, col2 = st.columns(2)
     with col1:
-        equipo_local = st.text_input("Equipo Local")
+        equipo_local = st.text_input("Equipo Local", key="sharp_local")
     with col2:
-        equipo_visitante = st.text_input("Equipo Visitante")
+        equipo_visitante = st.text_input("Equipo Visitante", key="sharp_visita")
         
-    cuota_rush = st.number_input("Cuota tomada en Rushbet", value=2.05, step=0.01)
-    cuota_pin = st.number_input("Cuota de referencia (Pinnacle)", value=1.90, step=0.01)
+    cuota_rush = st.number_input("Cuota tomada en Rushbet", value=2.05, step=0.01, key="sharp_rush")
+    cuota_pin = st.number_input("Cuota de referencia (Pinnacle)", value=1.90, step=0.01, key="sharp_pin")
     
-    if st.button("Calcular Edge y CLV Real"):
+    if st.button("Calcular Edge y CLV Real", key="btn_calc_sharp"):
         clv_diff = ((cuota_rush / cuota_pin) - 1) * 100
         st.success(f"Diferencial frente a Pinnacle (CLV / Edge): **+{clv_diff:.2f}%**")
         if clv_diff >= 7.5:
@@ -421,9 +420,9 @@ elif nav == "Registro y Control Financiero":
         st.subheader("Auditoría y Edición de Cuota Real / Resultados")
         st.markdown("Actualiza aquí la **Cuota Real Apostada** y el **Resultado** (`Ganada` / `Perdida`) para calcular de forma automática la rentabilidad:")
 
-        edited_df = st.data_editor(df_reg, use_container_width=True, key="editor_registro")
+        edited_df = st.data_editor(df_reg, use_container_width=True, key="editor_registro_financiero")
         
-        if st.button("Actualizar Cálculos Financieros"):
+        if st.button("Actualizar Cálculos Financieros", key="btn_actualizar_finanzas"):
             for idx, row in edited_df.iterrows():
                 try:
                     cuota_real = float(row["Cuota Real Apostada"])
