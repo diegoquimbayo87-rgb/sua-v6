@@ -22,7 +22,7 @@ st.markdown("""
         --text-main: #F3F4F6;
     }
 
-    /* Corrección de color de los botones de incremento/decremento a Naranja */
+    /* Corrección de color de los botones de incremento/decremento a Naranja (si aplica en componentes numéricos auxiliares) */
     div[data-baseweb="spinbutton"] button {
         background-color: #F97316 !important;
         color: white !important;
@@ -53,15 +53,10 @@ st.markdown("""
         border: 1px solid #374151;
         margin-bottom: 20px;
     }
-
-    .tag-pendiente { background-color: #F97316; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
-    .tag-gris { background-color: #6B7280; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
-    .tag-verde { background-color: #10B981; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
-    .tag-rojo { background-color: #EF4444; color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; }
 </style>
 """, unsafe_allow_html=True)
 
-# Inicializar Estado de Sesión y Bankroll
+# Inicializar Estado de Sesión y Bankroll numérico puro
 if "bankroll_inicial" not in st.session_state:
     st.session_state.bankroll_inicial = 2000000.0
 
@@ -80,22 +75,18 @@ if "tab_active" not in st.session_state:
 # ==================== VERIFICADOR REAL DE APIS ====================
 def verificar_api_status():
     status = {}
-    
-    # 1. API-Football
     try:
         res = requests.get("https://v3.football.api-sports.io/timezone", headers={"x-apisports-key": API_FOOTBALL_KEY}, timeout=3)
         status["API-Football"] = True if res.status_code == 200 else False
     except:
         status["API-Football"] = False
 
-    # 2. The Odds API
     try:
         res = requests.get(f"https://api.the-odds-api.com/v4/sports?apiKey={THE_ODDS_API_KEY}", timeout=3)
         status["The Odds API"] = True if res.status_code == 200 else False
     except:
         status["The Odds API"] = False
 
-    # 3. SportMonks
     try:
         res = requests.get(f"https://core-api.sportmonks.com/v1/core/states?api_token={SPORTMONKS_KEY}", timeout=3)
         status["SportMonks"] = True if res.status_code == 200 else False
@@ -105,7 +96,6 @@ def verificar_api_status():
     return status
 
 api_estados = verificar_api_status()
-todas_conectadas = all(api_estados.values())
 
 # ==================== SIDEBAR: NAVEGACIÓN Y CONFIGURACIÓN DE BANKROLL ====================
 st.sidebar.markdown("## **SÚA v6.3**")
@@ -113,8 +103,29 @@ st.sidebar.caption("Terminal Cuantitativa — Bogotá")
 st.sidebar.divider()
 
 st.sidebar.markdown("### Configuración de Capital")
-bankroll_input = st.sidebar.number_input("Bankroll Inicial (COP $)", value=float(st.session_state.bankroll_inicial), step=100000.0)
-st.session_state.bankroll_inicial = bankroll_input
+
+# Función auxiliar para formatear a estilo colombiano: 2.000.000,00
+def formatear_colombia(valor):
+    try:
+        parte_entera = int(round(valor, 2))
+        parte_decimal = int(round((valor - parte_entera) * 100))
+        # Formatear enteros con puntos
+        entera_str = f"{parte_entera:,}".replace(",", ".")
+        return f"{entera_str},{abs(parte_decimal):02d}"
+    except:
+        return "2.000.000,00"
+
+# Campo de texto para permitir formato personalizado con puntos de miles y coma decimal
+val_inicial_str = formatear_colombia(st.session_state.bankroll_inicial)
+bankroll_text = st.sidebar.text_input("Bankroll Inicial (COP $)", value=val_inicial_str)
+
+# Procesar la entrada del usuario para convertirla de nuevo a número flotante operable
+try:
+    # Limpiar puntos de miles y reemplazar coma decimal por punto para Python
+    limpio = bankroll_text.replace(".", "").replace(",", ".")
+    st.session_state.bankroll_inicial = float(limpio)
+except ValueError:
+    st.sidebar.error("Formato inválido. Use puntos para miles y coma para decimales (ej: 2.000.000,00)")
 
 st.sidebar.divider()
 st.sidebar.markdown("### Módulos Operativos")
@@ -151,7 +162,6 @@ if nav == "Dashboard - Oportunidades":
     st.markdown("## Dashboard de Oportunidades Algorítmicas")
     st.markdown("""
     > **Propósito del módulo:** Visualización en tiempo real de las mejores oportunidades detectadas por el motor cuantitativo de SÚA.
-    > Gestiona el Top de **6 oportunidades principales del día** y el bloque rotativo de **10 oportunidades para la jornada siguiente**.
     """)
     st.divider()
 
@@ -186,6 +196,8 @@ if nav == "Dashboard - Oportunidades":
     st.subheader(f"Listado de Oportunidades ({st.session_state.tab_active.upper()})")
     for opp in lista_activa:
         inversion_calculada = st.session_state.bankroll_inicial * opp['stake_pct']
+        inv_formato = formatear_colombia(inversion_calculada)
+        
         with st.expander(f"#{opp['id']} — {opp['hora']} | {opp['partido']} | {opp['mercado']} (IC: {opp['ic']} | Edge: +{opp['edge']}%)"):
             c1, c2, c3, c4, c5 = st.columns(5)
             with c1: st.metric(f"Cuota ({opp['casa']})", opp['cuota'])
@@ -194,7 +206,7 @@ if nav == "Dashboard - Oportunidades":
             with c4: st.metric("Edge Estimado", f"+{opp['edge']}%")
             with c5: 
                 st.markdown(f"**Decisión:** `{opp['dec']}`")
-                st.markdown(f"**Stake Rec.:** `$ {inversion_calculada:,.0f} COP`")
+                st.markdown(f"**Stake Rec.:** `$ {inv_formato} COP`")
             
             st.markdown("---")
             st.markdown("📈 **Evolución Histórica de la Cuota:**")
@@ -227,11 +239,7 @@ if nav == "Dashboard - Oportunidades":
 # ==================== 2. NUEVO ANÁLISIS ====================
 elif nav == "Nuevo Análisis":
     st.markdown("## Nuevo Análisis de Partido")
-    st.markdown("""
-    > **Propósito del módulo:** Búsqueda y validación puntual en caliente mediante las APIs conectadas.
-    """)
     st.divider()
-    
     query = st.text_input("Buscar equipo o liga...", placeholder="Ej: Manchester City, Real Madrid...")
     if query:
         st.info(f"Buscando coincidencias para '{query}' a través de API-Football y SportMonks...")
@@ -242,7 +250,6 @@ elif nav == "Nuevo Análisis":
 elif nav == "Checklists IC":
     st.markdown("## Checklists IC Cuantitativas")
     st.divider()
-    st.markdown("Parámetros de ponderación vigentes para Goles, Córneres y Tarjetas.")
 
 # ==================== 4. MATRIZ DE DECISIÓN ====================
 elif nav == "Matriz de Decisión":
@@ -270,9 +277,6 @@ elif nav == "Sharp Comparison":
 # ==================== 6. REGISTRO Y CONTROL FINANCIERO ====================
 elif nav == "Registro y Control Financiero":
     st.markdown("## Registro y Control Financiero e Institucional")
-    st.markdown("""
-    > **Propósito del módulo:** Auditoría avanzada de rendimiento, control de bankroll y rentabilidad.
-    """)
     st.divider()
 
     df_reg = st.session_state.registro_apuestas
@@ -292,8 +296,8 @@ elif nav == "Registro y Control Financiero":
         bankroll_actual = st.session_state.bankroll_inicial + ganancia_neta_total
 
         m1, m2, m3, m4, m5, m6 = st.columns(6)
-        with m1: st.metric("Bankroll Actual", f"$ {bankroll_actual:,.0f}")
-        with m2: st.metric("Profit Neto", f"$ {ganancia_neta_total:,.0f}")
+        with m1: st.metric("Bankroll Actual", f"$ {formatear_colombia(bankroll_actual)}")
+        with m2: st.metric("Profit Neto", f"$ {formatear_colombia(ganancia_neta_total)}")
         with m3: st.metric("Yield / ROI", f"{yield_pct:.2f}%")
         with m4: st.metric("Winrate", f"{winrate:.1f}%")
         with m5: st.metric("Total Órdenes", total_ordenes)
