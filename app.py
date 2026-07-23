@@ -1,97 +1,52 @@
 import streamlit as st
 import pandas as pd
-import requests
-from datetime import datetime
 
-st.set_page_config(page_title="SÚA v6.1 — Validador Rushbet", layout="wide", initial_sidebar_state="expanded")
+st.title("Nuevo Análisis de Partido")
 
-# ==================== ESTILOS ====================
-st.markdown("""
-<style>
-    .header {font-size: 2.8rem; font-weight: 900; letter-spacing: -2px;}
-    .subheader {font-size: 1.1rem; color: #64748B;}
-    .metric-big {font-size: 3.5rem; font-weight: 800; font-family: monospace;}
-    .card {background: #111827; padding: 20px; border-radius: 12px; border: 1px solid #1F2937;}
-</style>
-""", unsafe_allow_html=True)
+# Input principal
+partido = st.text_input("Ingresa el partido", placeholder="Ej: Manchester City vs Arsenal")
 
-# ==================== CONFIGURACIÓN DE APIS ====================
-THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"  # Tu clave
-API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"   # Tu clave
-
-# ==================== SIDEBAR ====================
-st.sidebar.title("SÚA v6.1")
-st.sidebar.caption("Validador de Hipótesis Rushbet")
-nav = st.sidebar.radio("Módulos", [
-    "Dashboard - Oportunidades",
-    "Nuevo Análisis",
-    "Checklists IC",
-    "Matriz de Decisión",
-    "Sharp Comparison",
-    "Registro"
-])
-
-# ==================== DASHBOARD - OPORTUNIDADES DEL DÍA ====================
-if nav == "Dashboard - Oportunidades":
-    st.markdown('<div class="header">🔥 Oportunidades del Día Siguiente</div>', unsafe_allow_html=True)
-    st.markdown("**Hipótesis Rushbet detectadas • 23 Julio 2026**")
-
-    opportunities = [
-        {"partido": "Man City vs Arsenal", "mercado": "Over 2.5 Goles", "cuota": 2.15, "ic": 86, "edge": 11.2, "pinnacle": 2.08, "status": "🟢 FUERTE"},
-        {"partido": "Real Madrid vs Barcelona", "mercado": "Over 10.5 Corners", "cuota": 2.45, "ic": 82, "edge": 9.8, "pinnacle": 2.32, "status": "🟢 BUENA"},
-        {"partido": "Bayern vs Dortmund", "mercado": "Over 4.5 Tarjetas", "cuota": 2.35, "ic": 79, "edge": 7.5, "pinnacle": 2.28, "status": "🟡 Moderada"},
-    ]
-
-    for opp in opportunities:
-        with st.expander(f"**{opp['partido']}** — {opp['mercado']}"):
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.metric("Cuota Rushbet", opp['cuota'])
-            with col2:
-                st.metric("IC", opp['ic'])
-            with col3:
-                st.metric("Edge vs Pinnacle", f"+{opp['edge']}%")
-            with col4:
-                st.success(opp['status'])
-            
-            if st.button("Analizar este mercado", key=opp['partido']):
-                st.session_state.selected_match = opp['partido']
-                st.success(f"Abriendo análisis de {opp['partido']}...")
-
-# ==================== NUEVO ANÁLISIS ====================
-elif nav == "Nuevo Análisis":
-    st.header("Nuevo Análisis de Partido")
-    partido = st.text_input("Partido (ej: Man City vs Arsenal)")
-    if st.button("Cargar Datos desde APIs"):
-        st.success("Datos cargados desde API-Football y The Odds API")
-        st.info("IC calculado y comparación con Pinnacle lista.")
-
-# ==================== CHECKLISTS IC ====================
-elif nav == "Checklists IC":
-    st.header("Checklists IC por Mercado")
-    mercado = st.selectbox("Selecciona Mercado", ["Over/Under Goles", "Corners", "Tarjetas"])
-    st.write("Completa las métricas para calcular el IC")
-
-# ==================== MATRIZ ====================
-elif nav == "Matriz de Decisión":
-    st.header("Matriz de Decisión v4.1")
-    st.dataframe(pd.DataFrame({
-        "IC": ["90-100", "82-89", "74-81"],
-        "Decisión": ["🟢 FUERTE", "🟢 APOSTAR", "🟡 Moderado"],
-        "Stake": ["3-5%", "2-3%", "1-2%"]
-    }))
-
-# ==================== SHARP COMPARISON ====================
-elif nav == "Sharp Comparison":
-    st.header("🔍 Sharp Comparison (Pinnacle)")
-    home = st.text_input("Equipo Local")
-    away = st.text_input("Equipo Visitante")
-    if st.button("Consultar Pinnacle"):
-        st.info("Consultando The Odds API... (en producción mostraría datos reales)")
-
-# ==================== REGISTRO ====================
-elif nav == "Registro":
-    st.header("Registro de Apuestas")
-    st.write("Aquí se guardarán todas las operaciones.")
-
-st.sidebar.success("✅ APIs Conectadas")
+if partido:
+    st.subheader(f"Análisis: {partido}")
+    
+    # Selección de mercado
+    mercado = st.selectbox("Selecciona el Mercado a Analizar", 
+                          ["Over / Under Goles", "Córneres", "Tarjetas", "Disparos a Puerta"])
+    
+    st.divider()
+    
+    # Checklist según mercado
+    if mercado == "Over / Under Goles":
+        st.subheader("Checklist - Over / Under Goles")
+        xG = st.slider("xG Combinado últimos 6 partidos", 1.5, 4.5, 3.2, 0.1)
+        regresion = st.slider("Regresión (Goles - xG)", -1.0, 1.0, -0.5, 0.1)
+        over_hist = st.slider("% Over 2.5 últimos 8 PJ", 30, 80, 55)
+        
+        ic = int(30 * (xG > 3.4) + 20 * (regresion < -0.4) + 20 * (over_hist > 62) + 30)
+        st.metric("IC Calculado", ic, delta="Alto" if ic >= 80 else "Medio")
+    
+    elif mercado == "Córneres":
+        st.subheader("Checklist - Córneres")
+        centros = st.slider("Promedio Centros + Ataques por banda", 15, 35, 24)
+        bloqueos = st.slider("Remates bloqueados + PPDA bajo", 0, 30, 18)
+        ic = int(30 * (centros > 24) + 25 * (bloqueos > 18) + 45)
+        st.metric("IC Calculado", ic)
+    
+    elif mercado == "Tarjetas":
+        st.subheader("Checklist - Tarjetas")
+        arbitro = st.slider("Promedio tarjetas del árbitro", 2.0, 7.0, 4.8, 0.1)
+        faltas = st.slider("Promedio faltas cometidas", 15, 30, 22)
+        ic = int(30 * (arbitro > 5.0) + 25 * (faltas > 22) + 45)
+        st.metric("IC Calculado", ic)
+    
+    # Recomendación final
+    st.divider()
+    cuota = st.number_input("Cuota Rushbet", value=2.10, step=0.05)
+    if st.button("Generar Recomendación"):
+        if ic >= 80 and cuota >= 1.90:
+            st.success("Recomendación: APOSTAR")
+            st.info(f"Stake sugerido: 2.0% del bankroll")
+        elif ic >= 74:
+            st.warning("Recomendación: Apostar con moderación")
+        else:
+            st.error("Recomendación: NO APOSTAR")
