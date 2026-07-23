@@ -9,37 +9,37 @@ API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"
 THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"
 SPORTMONKS_KEY = "Aul9KNwcdeGqtmwHRR7VpUUQPxL7n2a3LmBqxEcwo1lOAhSJhAf1aYaZgkU9"
 
-# ==================== ESTILOS CSS PROFESIONALES (CERO ROJOS, SÓLIDOS AZUL/GRIS) ====================
+# ==================== ESTILOS CSS PROFESIONALES (AZUL ACERO SUAVE, CERO ROJOS) ====================
 st.markdown("""
 <style>
     .main {background-color: #0E1117;}
     
-    /* Forzar acentos neutros y azules ejecutivos, eliminando rojo por completo */
+    /* Paleta sobria con un azul corporativo suave y elegante para la vista */
     :root {
-        --primary: #3B82F6;
+        --primary: #1E40AF;
         --bg-dark: #0E1117;
         --card-bg: #1F2937;
         --text-main: #F3F4F6;
     }
 
-    /* Anular cualquier rastro de rojo en acentos de inputs o bordes activos */
-    input[type="radio"] {accent-color: #3B82F6 !important;}
+    /* Anular cualquier rastro de rojo o colores brillantes en inputs */
+    input[type="radio"] {accent-color: #1E40AF !important;}
     
-    /* Forzar que los botones primarios de Streamlit usen azul corporativo en vez de rojo/rosa */
+    /* Botones primarios con azul acero profesional de baja fatiga visual */
     div.stButton > button[kind="primary"] {
-        background-color: #2563EB !important;
-        border-color: #2563EB !important;
+        background-color: #1E3A8A !important;
+        border-color: #1E40AF !important;
         color: #FFFFFF !important;
     }
     
     div.stButton > button[kind="primary"]:hover {
-        background-color: #1D4ED8 !important;
+        background-color: #1E40AF !important;
         border-color: #1D4ED8 !important;
     }
 
-    /* Eliminar efectos de hover rojos en enlaces o pestañas */
+    /* Evitar brillos o efectos molestos al pasar el cursor */
     a:hover, button:hover {
-        color: #60A5FA !important;
+        color: #93C5FD !important;
     }
 
     .executive-card {
@@ -90,7 +90,7 @@ for op in menu_opciones:
 
 st.sidebar.divider()
 st.sidebar.markdown(
-    '<div style="background-color: #1E3A8A; color: #93C5FD; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
+    '<div style="background-color: #172554; color: #93C5FD; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
     unsafe_allow_html=True
 )
 
@@ -105,7 +105,6 @@ if nav == "Dashboard - Oportunidades":
     """)
     st.divider()
 
-    # Botones sólidos personalizados para las sub-pestañas
     col_t1, col_t2, _ = st.columns([2, 2, 3])
     with col_t1:
         if st.button("Hoy (23 Julio - Top 10)", use_container_width=True, type="primary" if st.session_state.tab_active=="hoy" else "secondary"):
