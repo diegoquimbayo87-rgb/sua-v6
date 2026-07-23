@@ -1,7 +1,6 @@
-# Let's update the PDF code to include:
-# 1. "Bank de inversión" (Investment Banking / módulo financiero o sección de banca de inversión).
-# 2. Status visual indicator for APIs (verde para conectadas, rojo para no conectadas).
+from weasyprint import HTML  # <--- Importación requerida para evitar el NameError
 
+# Definición del contenido HTML actualizado con el módulo financiero y estados de API (Verde/Rojo)
 html_content_updated = """
 <!DOCTYPE html>
 <html lang="es">
@@ -133,21 +132,21 @@ html_content_updated = """
     <h2>1. Indicadores Visuales de Conectividad de APIs</h2>
     <div class="card">
         <div class="card-title">Panel de Monitoreo de Conexiones (Dashboard Status)</div>
-        <p>Se ha implementado el indicador visual en tiempo real para reflejar el estado operativo de cada integración:</p>
+        <p>Se ha implementado el indicador visual en tiempo real para reflejar el estado operativo de cada integración[cite: 1]:</p>
         <ul>
-            <li><span class="status-dot dot-green"></span><strong>Verde (<code>#22c55e</code>):</strong> API conectada y respondiendo correctamente (Códigos HTTP 200-299). <span class="badge badge-green">Activa</span></li>
-            <li><span class="status-dot dot-red"></span><strong>Rojo (<code>#ef4444</code>):</strong> API desconectada, sin respuesta o con error crítico de enlace. <span class="badge badge-red">Sin Conexión</span></li>
+            <li><span class="status-dot dot-green"></span><strong>Verde (<code>#22c55e</code>):</strong> API conectada y respondiendo correctamente (Códigos HTTP 200-299)[cite: 1]. <span class="badge badge-green">Activa</span>[cite: 1]</li>
+            <li><span class="status-dot dot-red"></span><strong>Rojo (<code>#ef4444</code>):</strong> API desconectada, sin respuesta o con error crítico de enlace[cite: 1]. <span class="badge badge-red">Sin Conexión</span>[cite: 1]</li>
         </ul>
         <pre><code>// Componente de Estado de API en la Interfaz
 function ApiStatusIndicator({ apiName, isConnected }) {
     return (
-        <div style={{ display: 'flex', alignItems: 'center', padding: '6px 10px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }}>
-            <span style={{ height: '10px', width: '10px', borderRadius: '50%', backgroundColor: isConnected ? '#22c55e' : '#ef4444', marginRight: '8px' }}></span>
-            <span style={{ fontSize: '9pt', fontWeight: 'bold', color: '#0f172a' }}>{apiName}</span>
-            <span style={{ marginLeft: 'auto', fontSize: '8pt', color: isConnected ? '#166534' : '#991b1b' }}>
+        &lt;div style={{ display: 'flex', alignItems: 'center', padding: '6px 10px', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '4px', marginBottom: '6px' }}&gt;
+            &lt;span style={{ height: '10px', width: '10px', borderRadius: '50%', backgroundColor: isConnected ? '#22c55e' : '#ef4444', marginRight: '8px' }}&gt;&lt;/span&gt;
+            &lt;span style={{ fontSize: '9pt', fontWeight: 'bold', color: '#0f172a' }}&gt;{apiName}&lt;/span&gt;
+            &lt;span style={{ marginLeft: 'auto', fontSize: '8pt', color: isConnected ? '#166534' : '#991b1b' }}&gt;
                 {isConnected ? 'Conectada (Online)' : 'Desconectada (Offline)'}
-            </span>
-        </div>
+            &lt;/span&gt;
+        &lt;/div&gt;
     );
 }</code></pre>
     </div>
@@ -155,11 +154,11 @@ function ApiStatusIndicator({ apiName, isConnected }) {
     <h2>2. Integración del Módulo de Investment Banking (Bank de Inversión)</h2>
     <div class="card">
         <div class="card-title">Estructura del Módulo Financiero / Banca de Inversión</div>
-        <p>Se ha incorporado la sección dedicada a <strong>Investment Banking</strong> dentro del flujo de la plataforma, permitiendo gestionar portafolios, valoraciones de activos y líneas de crédito corporativo:</p>
+        <p>Se ha incorporado la sección dedicada a <strong>Investment Banking</strong> dentro del flujo de la plataforma, permitiendo gestionar portafolios, valoraciones de activos y líneas de crédito corporativo[cite: 1]:</p>
         <ul>
-            <li><strong>Gestión de Activos y Portafolios:</strong> Monitoreo de inversiones estructuradas y proyecciones de retorno.</li>
-            <li><strong>Evaluación de Riesgo:</strong> Conexión con modelos cuantitativos y métricas financieras corporativas.</li>
-            <li><strong>Etiquetas y Componentes Normalizados:</strong> Alineados bajo la paleta institucional (Azul oscuro <code>#0f172a</code>, acento <code>#3b82f6</code> y tarjetas limpias).</li>
+            <li><strong>Gestión de Activos y Portafolios:</strong> Monitoreo de inversiones estructuradas y proyecciones de retorno[cite: 1].</li>
+            <li><strong>Evaluación de Riesgo:</strong> Conexión con modelos cuantitativos y métricas financieras corporativas[cite: 1].</li>
+            <li><strong>Etiquetas y Componentes Normalizados:</strong> Alineados bajo la paleta institucional (Azul oscuro <code>#0f172a</code>, acento <code>#3b82f6</code> y tarjetas limpias)[cite: 1].</li>
         </ul>
     </div>
 
@@ -168,10 +167,10 @@ function ApiStatusIndicator({ apiName, isConnected }) {
         <div class="card-title">Estructura Base del Componente Investment Banking</div>
         <pre><code>const InvestmentBankingModule = () => {
     return (
-        <div className="investment-container" style={{ padding: '15px', background: '#f4f6f8' }}>
-            <h3 style={{ color: '#1e3a8a', borderBottom: '2px solid #3b82f6', paddingBottom: '5px' }}>Banca de Inversión & Portafolios</h3>
-            <p>Módulo configurado para la administración de activos, licencias y operaciones financieras corporativas.</p>
-        </div>
+        &lt;div className="investment-container" style={{ padding: '15px', background: '#f4f6f8' }}&gt;
+            &lt;h3 style={{ color: '#1e3a8a', borderBottom: '2px solid #3b82f6', paddingBottom: '5px' }}&gt;Banca de Inversión &amp; Portafolios&lt;/h3&gt;
+            &lt;p&gt;Módulo configurado para la administración de activos, licencias y operaciones financieras corporativas.&lt;/p&gt;
+        &lt;/div&gt;
     );
 };</code></pre>
     </div>
@@ -182,4 +181,4 @@ function ApiStatusIndicator({ apiName, isConnected }) {
 
 output_pdf = "Reporte_Tecnico_Investment_Banking_APIs.pdf"
 HTML(string=html_content_updated).write_pdf(output_pdf)
-print(f"PDF actualizado generado exitosamente: {output_pdf}")
+print(f"PDF generado exitosamente: {output_pdf}")
