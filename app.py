@@ -327,6 +327,6 @@ st.markdown("---")
 st.markdown("""
 <div style="display:flex; justify-content:space-between; align-items:center; padding: 20px 0; color:#8A9099; font-size:0.8rem;">
   <div>☀️ SÚA v6.0 — Quantitative Engine</div>
-  <div>Hecho por Diego Fernando Quimbayo · Diseñado con filosofía Apple · Operado con evidencia cuantitativa</div>
+  <div>Hecho con amor por Diego Fernando Quimbayo · Operado con evidencia cuantitativa</div>
 </div>
 """, unsafe_allow_html=True)
