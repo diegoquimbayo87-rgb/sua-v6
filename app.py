@@ -1,26 +1,25 @@
-# SÚA v6.0 — Dashboard Maestro Unificado, diseño Apple/Bloomberg
+# SÚA v6.0 — Terminal de Inteligencia Cuantitativa (Decision Operating System)
 import streamlit as st
 import pandas as pd
 import numpy as np
 import math
 
-st.set_page_config(page_title="SÚA v6.0 — Quant Intelligence", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="SÚA — Sports Intelligence Engine", layout="wide", initial_sidebar_state="expanded")
 
 # ==========================================
-# ESTILOS MINIMALISTAS (APPLE + BLOOMBERG)
+# ESTILOS TERMINAL PROFESIONAL (APPLE + BLOOMBERG)
 # ==========================================
 TERMINAL_CSS = """
 <style>
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700;800&display=swap');
 
 :root {
     --bg-base: #0B0F17;
-    --bg-surface: #111827;
-    --text-main: #F8FAFC;
+    --text-main: #FFFFFF;
     --text-muted: #64748B;
     --accent-blue: #3B82F6;
-    --border-subtle: rgba(255, 255, 255, 0.04);
+    --border-subtle: rgba(255, 255, 255, 0.06);
 }
 
 body, [class*="css"] {
@@ -33,41 +32,40 @@ body, [class*="css"] {
 footer {visibility: hidden;}
 header {visibility: hidden;}
 
-.wallet-card {
-    background: rgba(17, 24, 39, 0.7);
-    border: 1px solid var(--border-subtle);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-}
-.wallet-card:hover {
-    border-color: rgba(59, 130, 246, 0.3);
-}
-
 .metric-gigantic {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 3.2rem;
+    font-size: 4.5rem;
     font-weight: 800;
     line-height: 1.0;
     color: #FFFFFF;
-    letter-spacing: -2px;
+    letter-spacing: -3px;
 }
 .metric-label-sub {
     font-family: 'Satoshi', sans-serif;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1.5px;
-    margin-top: 6px;
+    letter-spacing: 2px;
+    margin-top: 8px;
+}
+.delta-blue {
+    color: var(--accent-blue);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+}
+
+.terminal-card {
+    background: transparent;
+    border-bottom: 1px solid var(--border-subtle);
+    padding-bottom: 24px;
+    margin-bottom: 24px;
 }
 
 .section-divider {
     height: 1px;
-    background: rgba(255, 255, 255, 0.06);
-    margin: 40px 0;
+    background: var(--border-subtle);
+    margin: 48px 0;
 }
 </style>
 """
@@ -75,114 +73,105 @@ header {visibility: hidden;}
 st.markdown(TERMINAL_CSS, unsafe_allow_html=True)
 
 # ==========================================
-# BARRA LATERAL (FILTROS Y CONTROL GLOBAL)
+# SIDEBAR — SISTEMA OPERATIVO
 # ==========================================
-st.sidebar.markdown("### 🎛️ SÚA Control Center")
-st.sidebar.markdown("Filtros globales de ejecución del motor cuantitativo.")
-filtro_liga = st.sidebar.selectbox("Filtrar Liga", ["Todas", "UEFA Europa League", "Liga BetPlay", "Amistosos de Clubes"])
+st.sidebar.markdown("""
+<div style="font-family:'JetBrains Mono'; font-weight:800; font-size:1.2rem; letter-spacing:-1px; margin-bottom:4px;">SÚA</div>
+<div style="font-size:0.75rem; color:#64748B; text-transform:uppercase; letter-spacing:1px; margin-bottom:24px;">Sports Intelligence Engine</div>
+""", unsafe_allow_html=True)
+
+nav = st.sidebar.radio("Navegación", ["Overview", "Opportunities", "Markets", "Intelligence", "Models", "Portfolio", "History"], label_visibility="collapsed")
+
 st.sidebar.markdown("---")
-st.sidebar.markdown("🔹 **Estado del Motor:** Sincronizado")
-st.sidebar.markdown("🔹 **Latencia:** 12ms")
+st.sidebar.markdown("""
+<div style="font-family:'JetBrains Mono'; font-size:0.75rem; color:#64748B; line-height:1.6;">
+    <strong>Motor</strong><br>● Online<br><br>
+    <strong>API</strong><br>2/2<br><br>
+    <strong>Última Sync</strong><br>14:22
+</div>
+""", unsafe_allow_html=True)
 
 # ==========================================
-# CUERPO PRINCIPAL — DASHBOARD UNIFICADO
+# CUERPO PRINCIPAL — DECISION OPERATING SYSTEM
 # ==========================================
 
-# 1. OVERVIEW SECTION
-st.title("🏠 Overview — Centro de Inteligencia")
-st.markdown("Bienvenido al Sistema Operativo de Decisiones de SÚA.")
-st.markdown("<br>", unsafe_allow_html=True)
+# 1. HEADER & INTRO CONTEXTUAL (CERO ESPACIO VACÍO)
+st.markdown("""
+<div style="font-size:2.8rem; font-weight:900; letter-spacing:-1px; margin-bottom:4px;">Overview</div>
+<div style="font-size:1rem; color:#64748B; font-weight:500; margin-bottom:24px;">Sistema Operativo de Decisiones</div>
+<div style="font-family:'JetBrains Mono'; font-size:0.9rem; color:#94A3B8; background:rgba(255,255,255,0.02); padding:16px 20px; border-radius:12px; border:1px solid rgba(255,255,255,0.04); margin-bottom:32px;">
+    Buenos días Diego. Hoy el sistema encontró <strong style="color:#FFF;">27 partidos</strong> ↓ <strong style="color:#FFF;">6 oportunidades</strong> ↓ <strong style="color:#FFF;">2 apuestas Premium</strong>.
+</div>
+""", unsafe_allow_html=True)
 
+# 2. MÉTRICAS PRINCIPALES (TODO BLANCO, DELTA EN AZUL)
 col1, col2, col3 = st.columns(3)
 with col1:
-    st.markdown('<div class="metric-gigantic">+7.42%</div><div class="metric-label-sub">Edge Promedio Hoy</div>', unsafe_allow_html=True)
+    st.markdown('''
+        <div class="metric-gigantic">+7.42%</div>
+        <div class="metric-label-sub">Edge Promedio Hoy <span class="delta-blue">(+0.8%)</span></div>
+    ''', unsafe_allow_html=True)
 with col2:
-    st.markdown('<div class="metric-gigantic" style="color:#3B82F6;">94.2</div><div class="metric-label-sub">Score de Confianza</div>', unsafe_allow_html=True)
+    st.markdown('''
+        <div class="metric-gigantic">94.2</div>
+        <div class="metric-label-sub">Confidence Score <span class="delta-blue">(+2.4%)</span></div>
+    ''', unsafe_allow_html=True)
 with col3:
-    st.markdown('<div class="metric-gigantic" style="color:#10B981;">80%</div><div class="metric-label-sub">Índice de Salud</div>', unsafe_allow_html=True)
+    st.markdown('''
+        <div class="metric-gigantic">80%</div>
+        <div class="metric-label-sub">Índice de Salud <span class="delta-blue">(Stable)</span></div>
+    ''', unsafe_allow_html=True)
 
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-# 2. MARKETS SECTION
-st.title("📈 Markets — Tendencias de Cuotas")
-st.markdown("Monitor de comportamiento temporal de cuotas frente al modelo cuantitativo.")
-st.markdown("<br>", unsafe_allow_html=True)
+# 3. PANEL DE INTELIGENCIA / ESTADO DEL MOTOR
+st.markdown("""
+<div style="font-size:1.4rem; font-weight:800; margin-bottom:16px;">Estado del Motor Cuantitativo</div>
+""", unsafe_allow_html=True)
+
+col_i1, col_i2, col_i3, col_i4 = st.columns(4)
+with col_i1:
+    st.markdown('<div style="font-family:\'JetBrains Mono\'; font-size:0.85rem; color:#64748B;">● IA</div><div style="font-size:1.1rem; font-weight:700; margin-top:4px;">Activo</div>', unsafe_allow_html=True)
+with col_i2:
+    st.markdown('<div style="font-family:\'JetBrains Mono\'; font-size:0.85rem; color:#64748B;">● APIs</div><div style="font-size:1.1rem; font-weight:700; margin-top:4px;">Sincronizadas</div>', unsafe_allow_html=True)
+with col_i3:
+    st.markdown('<div style="font-family:\'JetBrains Mono\'; font-size:0.85rem; color:#64748B;">● Monte Carlo</div><div style="font-size:1.1rem; font-weight:700; margin-top:4px;">10 000 simulaciones</div>', unsafe_allow_html=True)
+with col_i4:
+    st.markdown('<div style="font-family:\'JetBrains Mono\'; font-size:0.85rem; color:#64748B;">● Última actualización</div><div style="font-size:1.1rem; font-weight:700; margin-top:4px;">Hace 34 segundos</div>', unsafe_allow_html=True)
+
+st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
+
+# 4. MARKETS — MOVIMIENTO DEL EDGE (3 LÍNEAS MULTI-FUENTE)
+st.markdown("""
+<div style="font-size:1.4rem; font-weight:800; margin-bottom:4px;">Movimiento del Edge</div>
+<div style="font-size:0.85rem; color:#64748B; margin-bottom:20px;">Seguimiento temporal a 24 horas (RushBet vs Pinnacle vs Modelo SÚA)</div>
+""", unsafe_allow_html=True)
 
 horas = [f"-{h}h" for h in range(24, 0, -2)]
-df = pd.DataFrame({
-    "SÚA Modelo": [72 + np.sin(i/3)*3 for i in range(len(horas))], 
-    "Mercado": [65 + np.cos(i/2)*5 for i in range(len(horas))]
+df_edges = pd.DataFrame({
+    "RushBet": [62 + np.sin(i/3)*4 for i in range(len(horas))],
+    "Pinnacle": [68 + np.cos(i/2)*3 for i in range(len(horas))],
+    "Modelo SUA": [75 + np.sin(i/2.5)*5 for i in range(len(horas))]
 }, index=horas)
-st.line_chart(df, color=["#3B82F6", "#64748B"])
+st.line_chart(df_edges, color=["#64748B", "#94A3B8", "#3B82F6"])
 
 st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
 
-# 3. INTELLIGENCE SECTION
-st.title("🧠 Intelligence — Laboratorio de Poisson & Disparos")
-st.markdown("Simulación paramétrica de flujos ofensivos y remates esperados.")
-st.markdown("<br>", unsafe_allow_html=True)
+# 5. RESUMEN EJECUTIVO & ACCIÓN INMEDIATA ("¿QUÉ DEBERÍA HACER HOY?")
+st.markdown("""
+<div style="font-size:1.4rem; font-weight:800; margin-bottom:16px;">Recomendación Inmediata de Hoy</div>
+""", unsafe_allow_html=True)
 
-lambda_param = st.slider("Media Proyectada de Goles (λ Lambda)", 1.0, 6.0, 2.8, 0.1)
-x_vals = list(range(0, 10))
-y_vals = [math.exp(-lambda_param) * (lambda_param**k) / math.factorial(k) for k in x_vals]
-df_pois = pd.DataFrame({"Probabilidad": y_vals}, index=x_vals)
-st.line_chart(df_pois, color="#3B82F6")
-
-st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-
-# 4. OPPORTUNITIES SECTION
-st.title("🎯 Opportunities — Feed de Partidos Filtrados")
-st.markdown("Encuentros validados bajo el estándar de arista positiva del motor.")
-st.markdown("<br>", unsafe_allow_html=True)
-
-oportunidades = [
-    {"liga": "UEFA Europa League", "hora": "17:00", "local": "Dinamo de Kyiv", "visitante": "PAOK", "mercado": "Menos de 2,5 goles", "arista": "+16,4%", "conf": "96"},
-    {"liga": "Amistosos de Clubes", "hora": "16:30", "local": "Francos Borains", "visitante": "Tubize", "mercado": "Más de 2,5 goles", "arista": "+16,4%", "conf": "92"}
-]
-
-for op in oportunidades:
-    st.markdown(f"""
-    <div class="wallet-card">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-family:'JetBrains Mono'; font-size:0.7rem; color:var(--text-muted); text-transform:uppercase;">{op['liga']} • {op['hora']}</span>
-            <span style="background:rgba(59,130,246,0.1); color:#3B82F6; padding:4px 10px; border-radius:20px; font-size:0.7rem; font-weight:700;">Arista {op['arista']}</span>
-        </div>
-        <div style="font-size:1.2rem; font-weight:900; margin-bottom:12px;">{op['local']} <span style="color:#64748B; font-weight:400; font-size:0.9rem;">vs</span> {op['visitante']}</div>
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:#64748B;">
-            <div>Selección: <strong style="color:#F8FAFC;">{op['mercado']}</strong></div>
-            <div>Confidence Score: <strong style="color:#3B82F6; font-family:'JetBrains Mono';">{op['conf']}% (A+)</strong></div>
-        </div>
+st.markdown("""
+<div class="terminal-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-family:'JetBrains Mono'; font-size:0.75rem; color:#64748B; text-transform:uppercase;">Ejecución Prioritaria</span>
+        <span style="color:#3B82F6; font-family:'JetBrains Mono'; font-weight:700;">Confianza A+</span>
     </div>
-    """, unsafe_allow_html=True)
+    <div style="font-size:1.5rem; font-weight:900; margin-bottom:8px;">Mayor Edge Detectado: <span style="color:#3B82F6;">+11.8%</span></div>
+    <div style="font-size:0.9rem; color:#94A3B8; margin-bottom:20px;">24 partidos analizados validados bajo filtros estrictos de valor esperado y modelos estocásticos.</div>
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-
-# 5. PORTFOLIO SECTION
-st.title("📊 Portfolio — Gestión y Rendimiento")
-st.markdown("Seguimiento del rendimiento acumulado de las decisiones del sistema.")
-st.markdown("<br>", unsafe_allow_html=True)
-st.info("Módulo de gestión de capital y seguimiento activo de yield sincronizado.")
-
-st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-
-# 6. RESEARCH SECTION
-st.title("📚 Research — Auditoría Histórica")
-st.markdown("Registro estructurado de backtesting mensual y auditoría de modelos.")
-st.markdown("<br>", unsafe_allow_html=True)
-
-audit_data = pd.DataFrame([
-    {"Mes": "Enero 2026", "Tendencias": 312, "Winrate": "76%", "Yield": "+22,3%"},
-    {"Mes": "Febrero 2026", "Tendencias": 280, "Winrate": "74%", "Yield": "+18,5%"},
-    {"Mes": "Marzo 2026", "Tendencias": 295, "Winrate": "77%", "Yield": "+21,1%"}
-])
-st.dataframe(audit_data, use_container_width=True, hide_index=True)
-
-st.markdown('<div class="section-divider"></div>', unsafe_allow_html=True)
-
-# 7. SETTINGS SECTION
-st.title("⚙ Settings — Conexiones y APIs")
-st.markdown("Parámetros del sistema operativo y fuentes de datos en tiempo real.")
-st.markdown("<br>", unsafe_allow_html=True)
-st.text_input("API Key de Proveedor de Cuotas", "************************", type="password")
-st.text_input("Endpoint de Modelos de Poisson", "https://api.sua-quant.internal/v6/engine")
-st.button("Guardar Cambios")
+if st.button("Ver oportunidades", type="primary", use_container_width=True):
+    st.toast("Cargando matriz de oportunidades filtradas...", icon="⚡")
