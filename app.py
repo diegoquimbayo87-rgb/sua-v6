@@ -9,27 +9,27 @@ API_FOOTBALL_KEY = "e3b8ae61d764d2c7921d8ee4330780dd"
 THE_ODDS_API_KEY = "b3c6a21e035b017baca7358be08df34c"
 SPORTMONKS_KEY = "Aul9KNwcdeGqtmwHRR7VpUUQPxL7n2a3LmBqxEcwo1lOAhSJhAf1aYaZgkU9"
 
-# ==================== ESTILOS CSS PROFESIONALES (CERO ROJOS) ====================
+# ==================== ESTILOS CSS (AZUL ELEGANTE / CERO ROJOS) ====================
 st.markdown("""
 <style>
     .main {background-color: #0E1117;}
     
     :root {
-        --primary: #F97316;
+        --primary: #2563EB;
         --bg-dark: #0E1117;
         --card-bg: #1F2937;
         --text-main: #F3F4F6;
     }
 
-    /* 1. FORZAR BOTONES PRIMARIOS A NARANJA EN VEZ DE ROJO */
+    /* 1. FORZAR BOTONES PRIMARIOS A AZUL ELEGANTE */
     button[kind="primary"] {
-        background-color: #F97316 !important;
-        border-color: #F97316 !important;
+        background-color: #2563EB !important;
+        border-color: #2563EB !important;
         color: #FFFFFF !important;
     }
     button[kind="primary"]:hover {
-        background-color: #EA580C !important;
-        border-color: #EA580C !important;
+        background-color: #1D4ED8 !important;
+        border-color: #1D4ED8 !important;
         color: #FFFFFF !important;
     }
 
@@ -46,7 +46,7 @@ st.markdown("""
     }
 
     /* 3. ELIMINAR CUALQUIER COLOR ROJO EN INPUTS O RADIOS */
-    input[type="radio"] {accent-color: #F97316 !important;}
+    input[type="radio"] {accent-color: #2563EB !important;}
     
     /* 4. CONTENEDOR DE TARJETAS EJECUTIVAS */
     .executive-card {
@@ -59,8 +59,8 @@ st.markdown("""
 
     /* 5. EVITAR BRILLOS O BORDES ROJOS AL HACER FOCO */
     *:focus {
-        box-shadow: 0 0 0 2px #F97316 !important;
-        border-color: #F97316 !important;
+        box-shadow: 0 0 0 2px #2563EB !important;
+        border-color: #2563EB !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -103,7 +103,7 @@ for op in menu_opciones:
 
 st.sidebar.divider()
 st.sidebar.markdown(
-    '<div style="background-color: #166534; color: #22C55E; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
+    '<div style="background-color: #1E3A8A; color: #93C5FD; padding: 10px; border-radius: 8px; text-align: center; font-weight: bold; font-size: 0.9rem;">APIs Conectadas • Online</div>', 
     unsafe_allow_html=True
 )
 
